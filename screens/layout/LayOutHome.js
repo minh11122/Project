@@ -26,6 +26,7 @@ export default function LayOutHome({ state, descriptors, navigation }) {
           Workout: 'clock',
           Discover: 'compass',
           Report: 'chart-bar',
+          Chat: 'comments',
           Settings: 'cog',
           Profile: 'user',
         };

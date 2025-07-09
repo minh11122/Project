@@ -6,6 +6,7 @@ import ReportScreen from '../screens/main/ReportScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
 import ProfileScreen from '../screens/main/ProfileScreen';
 import LayOutHome from '../screens/layout/LayOutHome';
+import ChatGemeni from '../screens/main/ChatGemeni';
 
 const Tab = createBottomTabNavigator();
 
@@ -19,6 +20,7 @@ export default function MainNavigator() {
       <Tab.Screen name="Workout" component={WorkoutScreen} options={{ tabBarLabel: 'Tập luyện' }} />
       <Tab.Screen name="Discover" component={DiscoverScreen} options={{ tabBarLabel: 'Khám phá' }} />
       <Tab.Screen name="Report" component={ReportScreen} options={{ tabBarLabel: 'Báo cáo' }} />
+      <Tab.Screen name="Chat" component={ChatGemeni} options={{ tabBarLabel: 'Chat' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Cài đặt' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Cá nhân' }} />
     </Tab.Navigator>
