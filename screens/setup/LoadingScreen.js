@@ -1,7 +1,13 @@
 import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+} from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
-import { FontAwesome5 } from "@expo/vector-icons"; // Dùng Expo
+import { FontAwesome5 } from "@expo/vector-icons";
 
 export default function ProgressPlanScreen({ navigation }) {
   const progress = 55;
@@ -9,77 +15,97 @@ export default function ProgressPlanScreen({ navigation }) {
   const strokeDashoffset = strokeDasharray * (1 - progress / 100);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH {"\n"}CHO BẠN</Text>
-      <Text style={styles.description}>
-        Đang chuẩn bị kế hoạch dựa trên mục tiêu của bạn...
-      </Text>
-
-      {/* Progress Circle */}
-      <View style={styles.progressContainer}>
-        <Svg width={192} height={192} viewBox="0 0 160 160">
-          <Circle cx={80} cy={80} r={70} stroke="#F0F0F0" strokeWidth={20} />
-          <Defs>
-            <LinearGradient id="blueGradient" x1="160" y1="80" x2="0" y2="80">
-              <Stop offset="0" stopColor="#005BFF" />
-              <Stop offset="1" stopColor="#007BFF" />
-            </LinearGradient>
-          </Defs>
-          <Circle
-            cx={80}
-            cy={80}
-            r={70}
-            stroke="url(#blueGradient)"
-            strokeWidth={20}
-            strokeLinecap="round"
-            strokeDasharray={strokeDasharray}
-            strokeDashoffset={strokeDashoffset}
-            transform="rotate(-90 80 80)"
-          />
-        </Svg>
-        <Text style={styles.progressText}>{progress}%</Text>
-      </View>
-
-      {/* Info */}
-      <View style={styles.infoContainer}>
-        <Text style={styles.infoLine}>
-          <FontAwesome5 name="check" size={14} color="#3b82f6" />{"  "}
-          Phân tích cơ thể của bạn:{" "}
-          <Text style={styles.highlightBlue}>169cm</Text>,{" "}
-          <Text style={styles.highlightBlue}>50.0kg</Text>
+    <ImageBackground
+      source={{
+        uri: "https://c4.wallpaperflare.com/wallpaper/756/656/18/look-pose-tattoo-tattoo-actor-hd-wallpaper-preview.jpg",
+      }}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
+      <View style={styles.container}>
+        <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH {"\n"}CHO BẠN</Text>
+        <Text style={styles.description}>
+          Đang chuẩn bị kế hoạch dựa trên mục tiêu của bạn...
         </Text>
-        <Text style={styles.infoLine}>
-          <FontAwesome5 name="sync-alt" size={14} color="#3b82f6" />{"  "}
-          Điều chỉnh cấp độ thể dục:{" "}
-          <Text style={styles.highlightStrong}>Người bắt đầu</Text>
-        </Text>
+
+        {/* Progress Circle */}
+        <View style={styles.progressContainer}>
+          <Svg width={192} height={192} viewBox="0 0 160 160">
+            <Circle cx={80} cy={80} r={70} stroke="#ccc" strokeWidth={20} />
+            <Defs>
+              <LinearGradient id="blueGradient" x1="160" y1="80" x2="0" y2="80">
+                <Stop offset="0" stopColor="#60A5FA" />
+                <Stop offset="1" stopColor="#3B82F6" />
+              </LinearGradient>
+            </Defs>
+            <Circle
+              cx={80}
+              cy={80}
+              r={70}
+              stroke="url(#blueGradient)"
+              strokeWidth={20}
+              strokeLinecap="round"
+              strokeDasharray={strokeDasharray}
+              strokeDashoffset={strokeDashoffset}
+              transform="rotate(-90 80 80)"
+            />
+          </Svg>
+          <Text style={styles.progressText}>{progress}%</Text>
+        </View>
+
+        {/* Info */}
+        <View style={styles.infoContainer}>
+          <Text style={styles.infoLine}>
+            <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
+            Phân tích cơ thể của bạn:{" "}
+            <Text style={styles.highlightBlue}>169cm</Text>,{" "}
+            <Text style={styles.highlightBlue}>50.0kg</Text>
+          </Text>
+          <Text style={styles.infoLine}>
+            <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
+            Điều chỉnh cấp độ thể dục:{" "}
+            <Text style={styles.highlightStrong}>Người bắt đầu</Text>
+          </Text>
+        </View>
+
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => navigation.navigate("Main")}
+        >
+          <Text style={styles.buttonText}>Bỏ qua</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate("Main")}>
-                <Text style={styles.buttonText}>Skip to Main</Text>
-              </TouchableOpacity>
-    </View>
+    </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: "rgba(0,0,0,0.6)",
+  },
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
   },
   title: {
-    fontSize: 30,
+    fontSize: 28,
     fontWeight: "900",
     textAlign: "center",
-    color: "#000",
+    color: "#fff",
   },
   description: {
     fontSize: 16,
     fontWeight: "400",
     textAlign: "center",
     marginTop: 12,
-    color: "#000",
+    color: "#fff",
   },
   progressContainer: {
     width: 192,
@@ -92,7 +118,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     fontSize: 48,
     fontWeight: "900",
-    color: "#000",
+    color: "#fff",
   },
   infoContainer: {
     marginTop: 40,
@@ -104,14 +130,26 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 12,
     textAlign: "center",
-    color: "#000",
+    color: "#fff",
   },
   highlightBlue: {
-    color: "#3b82f6",
+    color: "#93c5fd",
     fontWeight: "600",
   },
   highlightStrong: {
-    color: "#1e40af",
+    color: "#60a5fa",
     fontWeight: "900",
+  },
+  button: {
+    marginTop: 40,
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 9999,
+    backgroundColor: "#fff",
+  },
+  buttonText: {
+    fontWeight: "800",
+    fontSize: 16,
+    color: "#000",
   },
 });

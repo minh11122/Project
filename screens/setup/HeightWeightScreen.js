@@ -6,6 +6,7 @@ import {
   StyleSheet,
   ScrollView,
   SafeAreaView,
+  ImageBackground,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
@@ -17,116 +18,129 @@ export default function HeightWeightScreen({ navigation }) {
   const [height, setHeight] = useState(175);
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Header */}
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="black" />
-        </TouchableOpacity>
-        <View style={styles.progressBarContainer}>
-          <View style={styles.progressBar} />
+    <ImageBackground
+      source={{ uri: 'https://c4.wallpaperflare.com/wallpaper/632/152/1006/look-pose-tattoo-tattoo-actor-hd-wallpaper-preview.jpg' }}
+      style={styles.background}
+      resizeMode="cover"
+    >
+      <View style={styles.overlay} />
+      <SafeAreaView style={styles.container}>
+        {/* Header */}
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color="#fff" />
+          </TouchableOpacity>
+          <View style={styles.progressBarContainer}>
+            <View style={styles.progressBar} />
+          </View>
+          <TouchableOpacity>
+            <Text style={styles.skipText}>Bỏ qua</Text>
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity>
-          <Text style={styles.skipText}>Bỏ qua</Text>
-        </TouchableOpacity>
-      </View>
 
-      {/* Main content */}
-      <ScrollView contentContainerStyle={styles.main}>
-        <Text style={styles.title}>Hãy cho chúng tôi biết{"\n"}thêm về bạn</Text>
+        {/* Main content */}
+        <ScrollView contentContainerStyle={styles.main}>
+          <Text style={styles.title}>Hãy cho chúng tôi biết{"\n"}thêm về bạn</Text>
 
-        {/* Weight section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Cân nặng</Text>
-            <View style={styles.toggle}>
-              <TouchableOpacity
-                style={[styles.toggleButton, weightUnit === 'kg' && styles.active]}
-                onPress={() => setWeightUnit('kg')}
-              >
-                <Text style={weightUnit === 'kg' ? styles.activeText : styles.inactiveText}>kg</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.toggleButton, weightUnit === 'lbs' && styles.active]}
-                onPress={() => setWeightUnit('lbs')}
-              >
-                <Text style={weightUnit === 'lbs' ? styles.activeText : styles.inactiveText}>lbs</Text>
-              </TouchableOpacity>
+          {/* Weight section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Cân nặng</Text>
+              <View style={styles.toggle}>
+                <TouchableOpacity
+                  style={[styles.toggleButton, weightUnit === 'kg' && styles.active]}
+                  onPress={() => setWeightUnit('kg')}
+                >
+                  <Text style={weightUnit === 'kg' ? styles.activeText : styles.inactiveText}>kg</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.toggleButton, weightUnit === 'lbs' && styles.active]}
+                  onPress={() => setWeightUnit('lbs')}
+                >
+                  <Text style={weightUnit === 'lbs' ? styles.activeText : styles.inactiveText}>lbs</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </View>
 
-          <View style={styles.valueDisplay}>
-            <Text style={styles.value}>{weight.toFixed(1)}</Text>
-            <Text style={styles.unit}>{weightUnit}</Text>
-          </View>
-
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={30}
-            maximumValue={150}
-            step={0.1}
-            value={weight}
-            onValueChange={(val) => setWeight(val)}
-            minimumTrackTintColor="#2563eb"
-            maximumTrackTintColor="#e5e7eb"
-            thumbTintColor="#2563eb"
-          />
-        </View>
-
-        {/* Height section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Chiều cao</Text>
-            <View style={styles.toggle}>
-              <TouchableOpacity
-                style={[styles.toggleButton, heightUnit === 'cm' && styles.active]}
-                onPress={() => setHeightUnit('cm')}
-              >
-                <Text style={heightUnit === 'cm' ? styles.activeText : styles.inactiveText}>cm</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[styles.toggleButton, heightUnit === 'ft' && styles.active]}
-                onPress={() => setHeightUnit('ft')}
-              >
-                <Text style={heightUnit === 'ft' ? styles.activeText : styles.inactiveText}>ft</Text>
-              </TouchableOpacity>
+            <View style={styles.valueDisplay}>
+              <Text style={styles.value}>{weight.toFixed(1)}</Text>
+              <Text style={styles.unit}>{weightUnit}</Text>
             </View>
+
+            <Slider
+              style={{ width: '100%', height: 40 }}
+              minimumValue={30}
+              maximumValue={150}
+              step={0.1}
+              value={weight}
+              onValueChange={(val) => setWeight(val)}
+              minimumTrackTintColor="#3b82f6"
+              maximumTrackTintColor="#d1d5db"
+              thumbTintColor="#3b82f6"
+            />
           </View>
 
-          <View style={styles.valueDisplay}>
-            <Text style={styles.value}>{height}</Text>
-            <Text style={styles.unit}>{heightUnit}</Text>
+          {/* Height section */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Chiều cao</Text>
+              <View style={styles.toggle}>
+                <TouchableOpacity
+                  style={[styles.toggleButton, heightUnit === 'cm' && styles.active]}
+                  onPress={() => setHeightUnit('cm')}
+                >
+                  <Text style={heightUnit === 'cm' ? styles.activeText : styles.inactiveText}>cm</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.toggleButton, heightUnit === 'ft' && styles.active]}
+                  onPress={() => setHeightUnit('ft')}
+                >
+                  <Text style={heightUnit === 'ft' ? styles.activeText : styles.inactiveText}>ft</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+
+            <View style={styles.valueDisplay}>
+              <Text style={styles.value}>{height}</Text>
+              <Text style={styles.unit}>{heightUnit}</Text>
+            </View>
+
+            <Slider
+              style={{ width: '100%', height: 40 }}
+              minimumValue={120}
+              maximumValue={220}
+              step={1}
+              value={height}
+              onValueChange={(val) => setHeight(val)}
+              minimumTrackTintColor="#3b82f6"
+              maximumTrackTintColor="#d1d5db"
+              thumbTintColor="#3b82f6"
+            />
           </View>
 
-          <Slider
-            style={{ width: '100%', height: 40 }}
-            minimumValue={120}
-            maximumValue={220}
-            step={1}
-            value={height}
-            onValueChange={(val) => setHeight(val)}
-            minimumTrackTintColor="#2563eb"
-            maximumTrackTintColor="#e5e7eb"
-            thumbTintColor="#2563eb"
-          />
-        </View>
-
-        {/* NEXT button */}
-        <TouchableOpacity
-          style={styles.startButton}
-          onPress={() => navigation.navigate('Loading')}
-        >
-          <Text style={styles.startText}>TIẾP THEO</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          {/* NEXT button */}
+          <TouchableOpacity
+            style={styles.startButton}
+            onPress={() => navigation.navigate('Loading')}
+          >
+            <Text style={styles.startText}>TIẾP THEO</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0,0,0,0.6)',
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
     paddingHorizontal: 16,
     paddingTop: 12,
   },
@@ -145,10 +159,13 @@ const styles = StyleSheet.create({
   progressBar: {
     height: 8,
     borderRadius: 9999,
-    backgroundColor: '#2B6BFF',
+    backgroundColor: '#60a5fa',
     width: '100%',
   },
-  skipText: { fontSize: 14, color: '#000' },
+  skipText: {
+    fontSize: 14,
+    color: '#fff',
+  },
   main: {
     alignItems: 'center',
     padding: 16,
@@ -158,6 +175,7 @@ const styles = StyleSheet.create({
     fontWeight: '900',
     textAlign: 'center',
     marginBottom: 24,
+    color: '#fff',
   },
   section: {
     width: '100%',
@@ -173,6 +191,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontWeight: '900',
+    color: '#fff',
   },
   toggle: {
     flexDirection: 'row',
@@ -192,7 +211,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   inactiveText: {
-    color: '#9ca3af',
+    color: '#6b7280',
     fontWeight: '600',
   },
   valueDisplay: {
@@ -204,21 +223,22 @@ const styles = StyleSheet.create({
   value: {
     fontSize: 40,
     fontWeight: '900',
-    color: '#2563eb',
+    color: '#fff',
   },
   unit: {
     fontSize: 16,
     marginBottom: 2,
+    color: '#d1d5db',
   },
   startButton: {
     width: '100%',
-    backgroundColor: '#2563eb',
+    backgroundColor: '#10b981',
     paddingVertical: 12,
     borderRadius: 9999,
     marginTop: 12,
   },
   startText: {
-    color: 'white',
+    color: '#000',
     fontWeight: '900',
     fontSize: 16,
     textAlign: 'center',
