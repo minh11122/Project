@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ScrollView,
   View,
@@ -155,46 +155,84 @@ const WorkoutScreen = () => {
     </View>
   );
 
-  const WeeklyGoal = () => (
-    <View style={styles.weeklyGoal}>
-      <View style={styles.weeklyGoalHeader}>
-        <Text style={styles.weeklyGoalTitle}>Mục tiêu hàng tuần</Text>
-        <View style={styles.scoreContainer}>
-          <Text style={styles.scoreBlue}>0</Text>
-          <Text style={styles.scoreGray}>/7</Text>
-          <Text style={styles.editIcon}>✏️</Text>
+  const WeeklyGoal = () => {
+    const today = new Date();
+    const currentDay = today.getDate();
+    const currentWeekday = today.getDay();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+
+    // Calculate the start of the week (Monday)
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - (currentWeekday === 0 ? 6 : currentWeekday - 1));
+
+    // Generate array of 7 days with date objects for better handling
+    const daysOfWeek = Array.from({ length: 7 }, (_, index) => {
+      const day = new Date(startOfWeek);
+      day.setDate(startOfWeek.getDate() + index);
+      return {
+        date: day.getDate().toString(),
+        month: day.getMonth(),
+        year: day.getFullYear(),
+        isCurrentDay: day.getDate() === currentDay && day.getMonth() === currentMonth && day.getFullYear() === currentYear,
+      };
+    });
+
+    // Find index of current day
+    const currentDayIndex = currentWeekday === 0 ? 6 : currentWeekday - 1;
+
+    // Debugging logs
+    console.log('Current Date:', today.toISOString());
+    console.log('Start of Week:', startOfWeek.toISOString());
+    console.log('Days of Week:', daysOfWeek.map(d => `${d.date}/${d.month + 1}/${d.year}`));
+    console.log('Current Day Index:', currentDayIndex);
+
+    // Format week range for display (e.g., "7/7 - 13/7")
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    const weekRange = `${startOfWeek.getDate()}/${startOfWeek.getMonth() + 1} - ${endOfWeek.getDate()}/${endOfWeek.getMonth() + 1}`;
+
+    return (
+      <View style={styles.weeklyGoal}>
+        <View style={styles.weeklyGoalHeader}>
+          <Text style={styles.weeklyGoalTitle}>Mục tiêu hàng tuần ({weekRange})</Text>
+          <View style={styles.scoreContainer}>
+            <Text style={styles.scoreBlue}>0</Text>
+            <Text style={styles.scoreGray}>/7</Text>
+            <Text style={styles.editIcon}>✏️</Text>
+          </View>
+        </View>
+        <View style={styles.daysRow}>
+          {daysOfWeek.map((dayObj, index) => (
+            <TouchableOpacity
+              key={`${dayObj.date}-${dayObj.month}-${dayObj.year}-${index}`}
+              style={[
+                styles.dayButton,
+                dayObj.isCurrentDay && styles.activeDayButton,
+                index > currentDayIndex && styles.disabledDayButton,
+              ]}
+              disabled={index > currentDayIndex}
+            >
+              <Text
+                style={[
+                  styles.dayText,
+                  dayObj.isCurrentDay && styles.activeDayText,
+                  index > currentDayIndex && styles.disabledDayText,
+                ]}
+              >
+                {dayObj.date}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <View style={styles.weeklyMessage}>
+          <Text style={styles.motivationText}>
+            Thời gian tốt nhất để xây dựng bản thân mới luôn là NGAY BÂY GIỜ!
+          </Text>
         </View>
       </View>
-      <View style={styles.daysRow}>
-        {['22', '23', '24', '25', '26', '27', '28'].map((day, index) => (
-          <TouchableOpacity
-            key={day}
-            style={[
-              styles.dayButton,
-              index === 2 && styles.activeDayButton,
-              index > 3 && styles.disabledDayButton,
-            ]}
-            disabled={index > 3}
-          >
-            <Text
-              style={[
-                styles.dayText,
-                index === 2 && styles.activeDayText,
-                index > 3 && styles.disabledDayText,
-              ]}
-            >
-              {day}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-      <View style={styles.weeklyMessage}>
-        <Text style={styles.motivationText}>
-          Thời gian tốt nhất để xây dựng bản thân mới luôn là NGAY BÂY GIỜ!
-        </Text>
-      </View>
-    </View>
-  );
+    );
+  };
 
   const ChallengeCard = ({ item }) => (
     <View style={[styles.challengeCard, { backgroundColor: item.gradient[0] }]}>
@@ -251,19 +289,15 @@ const WorkoutScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
       <View style={styles.fixedHeaderContainer}>
         <Header />
       </View>
-      
-      {/* Scrollable Content */}
-      <ScrollView 
+      <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
         <SearchBar />
         <WeeklyGoal />
-        
         <View style={styles.challengeSection}>
           <Text style={styles.sectionTitle}>THỬ THÁCH 7x4</Text>
           <FlatList
@@ -275,7 +309,6 @@ const WorkoutScreen = () => {
             contentContainerStyle={styles.challengeList}
           />
         </View>
-
         <View style={styles.bodyFocusSection}>
           <Text style={styles.sectionTitle}>Cơ thể tập trung</Text>
           <ScrollView
@@ -310,7 +343,6 @@ const WorkoutScreen = () => {
             ))}
           </View>
         </View>
-
         <View style={styles.recommendSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Chỉ dành cho bạn</Text>
@@ -325,7 +357,6 @@ const WorkoutScreen = () => {
             scrollEnabled={false}
           />
         </View>
-
         <View style={styles.stretchSection}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Kéo giãn và khởi động</Text>
@@ -342,7 +373,6 @@ const WorkoutScreen = () => {
             contentContainerStyle={styles.stretchList}
           />
         </View>
-
         <View style={styles.goalsSection}>
           <Text style={styles.sectionTitle}>Mục tiêu phổ biến</Text>
           <ScrollView
@@ -382,7 +412,6 @@ const WorkoutScreen = () => {
             </TouchableOpacity>
           </View>
         </View>
-
         <View style={styles.discoverSection}>
           <View style={styles.discoverCard}>
             <Image
@@ -459,7 +488,7 @@ const styles = StyleSheet.create({
   searchIcon: { fontSize: 20, marginRight: 12 },
   searchInput: { flex: 1, fontSize: 16, color: colors.text },
   scrollContent: {
-    paddingTop: 60, // Adjust based on header height
+    paddingTop: 60,
   },
   weeklyGoal: {
     backgroundColor: colors.card,

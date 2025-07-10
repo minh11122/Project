@@ -9,8 +9,12 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  Image,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { PhotoService } from '../../services/PhotoService';
+import { AIService } from '../../services/AIService';
 
 export default function ChatGemeni() {
   const [messages, setMessages] = useState([]);
@@ -19,15 +23,14 @@ export default function ChatGemeni() {
 
   const sendMessage = async () => {
     if (!input.trim()) return;
-
-    const userMessage = { role: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
+    const userMsg = { role: 'user', text: input };
+    setMessages((prev) => [...prev, userMsg]);
     setInput('');
 
     try {
-      // Giả lập phản hồi từ Gemini
-      const geminiReply = { role: 'gemini', text: `Bạn vừa nói: ${input}` };
-      setMessages((prev) => [...prev, geminiReply]);
+      const geminiReply = await AIService._callGeminiAPI(null, input);
+      const geminiMsg = { role: 'gemini', text: geminiReply };
+      setMessages((prev) => [...prev, geminiMsg]);
     } catch (err) {
       setMessages((prev) => [
         ...prev,
@@ -36,19 +39,32 @@ export default function ChatGemeni() {
     }
   };
 
-  // Auto-scroll to the latest message
+  const handleTakePhoto = async () => {
+    const photo = await PhotoService.takePhoto();
+    if (!photo) return;
+
+    const userMsg = {
+      role: 'user',
+      text: '[Ảnh đã được gửi]',
+      photo,
+    };
+    setMessages((prev) => [...prev, userMsg]);
+
+    const description = await AIService.generateDescription(photo.uri);
+    const geminiMsg = { role: 'gemini', text: description, photo };
+    setMessages((prev) => [...prev, geminiMsg]);
+  };
+
   useEffect(() => {
-    if (scrollViewRef.current) {
-      scrollViewRef.current.scrollToEnd({ animated: true });
-    }
+    scrollViewRef.current?.scrollToEnd({ animated: true });
   }, [messages]);
 
   const Header = () => (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>TRÒ CHUYỆN</Text>
-      <TouchableOpacity>
+      <TouchableOpacity onPress={handleTakePhoto}>
         <View style={styles.iconButton}>
-          <Ionicons name="information-circle-outline" size={20} color={colors.text} />
+          <Ionicons name="camera-outline" size={20} color={colors.text} />
         </View>
       </TouchableOpacity>
     </View>
@@ -56,12 +72,10 @@ export default function ChatGemeni() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
       <View style={styles.fixedHeaderContainer}>
         <Header />
       </View>
 
-      {/* Scrollable Chat Area */}
       <KeyboardAvoidingView
         style={styles.chatContainer}
         behavior={Platform.select({ ios: 'padding', android: undefined })}
@@ -88,13 +102,18 @@ export default function ChatGemeni() {
                   msg.role === 'user' ? styles.userMessage : styles.geminiMessage,
                 ]}
               >
+                {msg.photo && (
+                  <Image
+                    source={{ uri: msg.photo.uri }}
+                    style={{ width: 200, height: 150, borderRadius: 12, marginBottom: 8 }}
+                  />
+                )}
                 <Text style={styles.messageText}>{msg.text}</Text>
               </View>
             ))
           )}
         </ScrollView>
 
-        {/* Input Area */}
         <View style={styles.inputArea}>
           <TextInput
             value={input}
@@ -136,7 +155,6 @@ const styles = StyleSheet.create({
     right: 0,
     zIndex: 10,
     backgroundColor: colors.background,
-    paddingTop: 0,
   },
   header: {
     flexDirection: 'row',
@@ -163,7 +181,7 @@ const styles = StyleSheet.create({
   },
   chatContent: {
     paddingHorizontal: 20,
-    paddingTop: 60, // Adjust for header
+    paddingTop: 60,
     paddingBottom: 24,
   },
   emptyState: {
@@ -183,11 +201,6 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginBottom: 12,
     maxWidth: '75%',
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 1,
   },
   userMessage: {
     backgroundColor: colors.primary,
@@ -211,11 +224,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
     borderTopWidth: 1,
     borderColor: colors.border,
-    shadowColor: colors.text,
-    shadowOffset: { width: 0, height: -1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
   },
   input: {
     flex: 1,
