@@ -17,14 +17,14 @@ const SettingsScreen = () => {
   const SettingItem = ({ icon, iconBg, title, subtitle, onPress, hasChevron = true }) => (
     <TouchableOpacity style={styles.settingItem} onPress={onPress}>
       <View style={[styles.iconBg, iconBg]}>
-        <Ionicons name={icon} size={16} color="white" />
+        <Ionicons name={icon} size={16} color={colors.card} />
       </View>
       <View style={styles.settingTextContainer}>
         <Text style={styles.settingTitle}>{title}</Text>
         {subtitle && <Text style={styles.settingSubtitle}>{subtitle}</Text>}
       </View>
       {hasChevron && (
-        <Ionicons name="chevron-forward" size={14} color="#9ca3af" />
+        <Ionicons name="chevron-forward" size={14} color={colors.secondary} />
       )}
     </TouchableOpacity>
   );
@@ -32,7 +32,7 @@ const SettingsScreen = () => {
   const MenuItem = ({ icon, title, onPress }) => (
     <TouchableOpacity style={styles.menuItem} onPress={onPress}>
       <View style={styles.menuIconWrapper}>
-        <Ionicons name={icon} size={16} color="white" />
+        <Ionicons name={icon} size={16} color={colors.card} />
       </View>
       <Text style={styles.menuTitle}>{title}</Text>
     </TouchableOpacity>
@@ -41,166 +41,189 @@ const SettingsScreen = () => {
   const SyncItem = ({ icon, title, enabled, onToggle }) => (
     <View style={styles.syncItem}>
       <View style={styles.syncIconBg}>
-        <Ionicons name={icon} size={16} color="#0284c7" />
+        <Ionicons name={icon} size={16} color={colors.primary} />
       </View>
       <Text style={styles.syncTitle}>{title}</Text>
       <Switch
         value={enabled}
         onValueChange={onToggle}
-        trackColor={{ false: '#d1d5db', true: '#2563eb' }}
-        thumbColor="white"
+        trackColor={{ false: colors.border, true: colors.primary }}
+        thumbColor={colors.card}
         style={styles.switch}
       />
     </View>
   );
 
+  const Header = () => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>SETTINGS</Text>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <Text style={styles.header}>SETTINGS</Text>
+    <SafeAreaView style={styles.container}>
+      {/* Fixed Header */}
+      <View style={styles.fixedHeaderContainer}>
+        <Header />
+      </View>
 
-          {/* Backup & Restore Section */}
-          <View style={styles.backupRestore}>
-            <View style={styles.backupText}>
-              <View style={styles.backupTitle}>
-                <Text style={styles.backupTitleText}>Backup & Restore</Text>
-                <Image
-                  source={{
-                    uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/512px-Google_2015_logo.svg.png'
-                  }}
-                  style={styles.googleLogo}
-                />
-              </View>
-              <Text style={styles.backupDesc}>Sign in and synchronize your data</Text>
+      {/* Scrollable Content */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Backup & Restore Section */}
+        <View style={styles.backupRestore}>
+          <View style={styles.backupText}>
+            <View style={styles.backupTitle}>
+              <Text style={styles.sectionTitle}>Backup & Restore</Text>
+              <Image
+                source={{
+                  uri: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/Google_2015_logo.svg/512px-Google_2015_logo.svg.png',
+                }}
+                style={styles.googleLogo}
+              />
             </View>
-            <TouchableOpacity style={styles.refreshButton}>
-              <Ionicons name="refresh" size={20} color="#2563eb" />
-            </TouchableOpacity>
+            <Text style={styles.backupDesc}>Sign in and synchronize your data</Text>
           </View>
-
-          {/* Premium Button */}
-          <TouchableOpacity style={styles.premiumButton}>
-            <Ionicons name="ban" size={16} color="white" />
-            <Text style={styles.premiumText}>GO PREMIUM</Text>
+          <TouchableOpacity style={styles.refreshButton}>
+            <Ionicons name="refresh" size={20} color={colors.primary} />
           </TouchableOpacity>
-
-          {/* Settings List */}
-          <View style={styles.settingsList}>
-            <SettingItem
-              icon="fitness"
-              iconBg={styles.greenBg}
-              title="Workout Settings"
-              onPress={() => console.log('Workout Settings pressed')}
-            />
-            <View style={styles.separator} />
-            <SettingItem
-              icon="settings"
-              iconBg={styles.blueBg}
-              title="General Settings"
-              onPress={() => console.log('General Settings pressed')}
-            />
-            <View style={styles.separator} />
-            <SettingItem
-              icon="mic"
-              iconBg={styles.yellowBg}
-              title="Voice Options (TTS)"
-              onPress={() => console.log('Voice Options pressed')}
-            />
-            <View style={styles.separator} />
-            <SettingItem
-              icon="chatbubble-ellipses"
-              iconBg={styles.cyanBg}
-              title="Suggest Other Features"
-              onPress={() => console.log('Suggest Features pressed')}
-            />
-            <View style={styles.separator} />
-            <SettingItem
-              icon="globe"
-              iconBg={styles.purpleBg}
-              title="Language Options"
-              subtitle="Default"
-              onPress={() => console.log('Language Options pressed')}
-            />
-            <View style={styles.separator} />
-            <SyncItem
-              icon="heart"
-              title="Sync to Health Connect"
-              enabled={healthConnectEnabled}
-              onToggle={setHealthConnectEnabled}
-            />
-          </View>
-
-          {/* Menu Container */}
-          <View style={styles.menuContainer}>
-            <MenuItem
-              icon="share-social"
-              title="Share with friends"
-              onPress={() => console.log('Share pressed')}
-            />
-            <View style={styles.separator} />
-            <MenuItem
-              icon="star"
-              title="Rate us"
-              onPress={() => console.log('Rate us pressed')}
-            />
-            <View style={styles.separator} />
-            <MenuItem
-              icon="pencil"
-              title="Feedback"
-              onPress={() => console.log('Feedback pressed')}
-            />
-            <View style={styles.separator} />
-            <MenuItem
-              icon="ban"
-              title="Remove Ads"
-              onPress={() => console.log('Remove Ads pressed')}
-            />
-          </View>
-
-          <Text style={styles.version}>Version 1.5.2Y</Text>
         </View>
+
+        {/* Premium Button */}
+        <TouchableOpacity style={styles.premiumButton}>
+          <Ionicons name="ban" size={16} color={colors.card} />
+          <Text style={styles.premiumText}>GO PREMIUM</Text>
+        </TouchableOpacity>
+
+        {/* Settings List */}
+        <View style={styles.settingsList}>
+          <SettingItem
+            icon="fitness"
+            iconBg={styles.greenBg}
+            title="Workout Settings"
+            onPress={() => console.log('Workout Settings pressed')}
+          />
+          <View style={styles.separator} />
+          <SettingItem
+            icon="settings"
+            iconBg={styles.blueBg}
+            title="General Settings"
+            onPress={() => console.log('General Settings pressed')}
+          />
+          <View style={styles.separator} />
+          <SettingItem
+            icon="mic"
+            iconBg={styles.yellowBg}
+            title="Voice Options (TTS)"
+            onPress={() => console.log('Voice Options pressed')}
+          />
+          <View style={styles.separator} />
+          <SettingItem
+            icon="chatbubble-ellipses"
+            iconBg={styles.cyanBg}
+            title="Suggest Other Features"
+            onPress={() => console.log('Suggest Features pressed')}
+          />
+          <View style={styles.separator} />
+          <SettingItem
+            icon="globe"
+            iconBg={styles.purpleBg}
+            title="Language Options"
+            subtitle="Default"
+            onPress={() => console.log('Language Options pressed')}
+          />
+          <View style={styles.separator} />
+          <SyncItem
+            icon="heart"
+            title="Sync to Health Connect"
+            enabled={healthConnectEnabled}
+            onToggle={setHealthConnectEnabled}
+          />
+        </View>
+
+        {/* Menu Container */}
+        <View style={styles.menuContainer}>
+          <MenuItem
+            icon="share-social"
+            title="Share with friends"
+            onPress={() => console.log('Share pressed')}
+          />
+          <View style={styles.separator} />
+          <MenuItem
+            icon="star"
+            title="Rate us"
+            onPress={() => console.log('Rate us pressed')}
+          />
+          <View style={styles.separator} />
+          <MenuItem
+            icon="pencil"
+            title="Feedback"
+            onPress={() => console.log('Feedback pressed')}
+          />
+          <View style={styles.separator} />
+          <MenuItem
+            icon="ban"
+            title="Remove Ads"
+            onPress={() => console.log('Remove Ads pressed')}
+          />
+        </View>
+
+        <Text style={styles.version}>Version 1.5.2Y</Text>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+const colors = {
+  primary: '#2563eb',
+  secondary: '#9ca3af',
+  background: '#f9fafb',
+  card: '#fff',
+  text: '#000',
+  muted: '#6b7280',
+  border: '#e5e7eb',
+  accent: '#f9d8a6',
+  accentText: '#6b4b00',
+};
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: 'white',
-  },
   container: {
     flex: 1,
-    backgroundColor: 'white',
+    backgroundColor: colors.background,
   },
-  content: {
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: '100%',
-    backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-    elevation: 3,
-    margin: 20,
-    padding: 20,
-    paddingBottom: 10,
+  fixedHeaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: colors.background,
+    paddingTop: 0,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  headerTitle: {
+    fontSize: 24,
     fontWeight: '800',
-    fontSize: 18,
-    color: 'black',
-    marginBottom: 20,
-    fontFamily: 'System',
+    color: colors.text,
+  },
+  scrollContent: {
+    paddingTop: 60, // Adjust based on header height
+    paddingHorizontal: 20,
+    paddingBottom: 40,
   },
   backupRestore: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    marginBottom: 24,
   },
   backupText: {
     flex: 1,
@@ -208,61 +231,60 @@ const styles = StyleSheet.create({
   backupTitle: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 2,
+    marginBottom: 4,
   },
-  backupTitleText: {
-    fontWeight: '600',
-    fontSize: 14,
-    color: 'black',
-    marginRight: 4,
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.text,
   },
   googleLogo: {
     width: 16,
     height: 16,
     resizeMode: 'contain',
+    marginLeft: 4,
   },
   backupDesc: {
-    fontSize: 11,
-    color: '#6b7280',
-    lineHeight: 13,
+    fontSize: 12,
+    color: colors.muted,
+    lineHeight: 16,
   },
   refreshButton: {
-    padding: 4,
+    padding: 8,
+    backgroundColor: colors.border,
+    borderRadius: 12,
   },
   premiumButton: {
     width: '100%',
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.accent,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
     paddingVertical: 12,
-    borderRadius: 20,
-    marginBottom: 20,
+    borderRadius: 24,
+    marginBottom: 24,
     gap: 8,
   },
   premiumText: {
-    color: 'white',
+    color: colors.accentText,
     fontWeight: '600',
     fontSize: 14,
   },
   settingsList: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    borderRadius: 24,
+    backgroundColor: colors.card,
+    marginBottom: 24,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
     elevation: 2,
-    marginBottom: 20,
   },
   settingItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    paddingHorizontal: 16,
-    backgroundColor: 'white',
+    padding: 16,
+    paddingHorizontal: 20,
   },
   iconBg: {
     width: 32,
@@ -276,20 +298,20 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   settingTitle: {
-    fontSize: 14,
-    color: 'black',
-    fontWeight: '400',
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '600',
   },
   settingSubtitle: {
-    fontSize: 11,
-    color: '#9ca3af',
-    marginTop: 2,
+    fontSize: 12,
+    color: colors.muted,
+    marginTop: 4,
   },
   syncItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    paddingHorizontal: 16,
+    padding: 16,
+    paddingHorizontal: 20,
   },
   syncIconBg: {
     width: 32,
@@ -302,50 +324,50 @@ const styles = StyleSheet.create({
   },
   syncTitle: {
     flex: 1,
-    fontSize: 14,
-    color: 'black',
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '600',
   },
   switch: {
     transform: [{ scaleX: 0.8 }, { scaleY: 0.8 }],
   },
   menuContainer: {
-    borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    backgroundColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    borderRadius: 24,
+    backgroundColor: colors.card,
+    marginBottom: 24,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
     elevation: 2,
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
-    paddingHorizontal: 16,
-    backgroundColor: 'white',
+    padding: 16,
+    paddingHorizontal: 20,
   },
   menuIconWrapper: {
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#64748b',
+    backgroundColor: colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
   menuTitle: {
-    fontSize: 14,
-    color: 'black',
+    fontSize: 16,
+    color: colors.text,
+    fontWeight: '600',
   },
   separator: {
     height: 1,
-    backgroundColor: '#e5e7eb',
+    backgroundColor: colors.border,
   },
   version: {
     textAlign: 'center',
-    color: '#9ca3af',
+    color: colors.muted,
     fontSize: 12,
     paddingVertical: 16,
   },
@@ -354,7 +376,6 @@ const styles = StyleSheet.create({
   yellowBg: { backgroundColor: '#f59e0b' },
   cyanBg: { backgroundColor: '#06b6d4' },
   purpleBg: { backgroundColor: '#6b21a8' },
-  grayBg: { backgroundColor: '#64748b' },
 });
 
 export default SettingsScreen;
