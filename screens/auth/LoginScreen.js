@@ -1,7 +1,10 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, TextInput } from 'react-native';
 
 export default function LoginScreen({ navigation }) {
+  const [emailOrPhone, setEmailOrPhone] = useState('');
+  const [password, setPassword] = useState('');
+
   return (
     <ImageBackground
       source={{ uri: 'https://cdn.magicdecor.in/com/2023/10/13181733/Heavy-Lifting.jpg' }}
@@ -13,6 +16,23 @@ export default function LoginScreen({ navigation }) {
       <View style={styles.container}>
         <Text style={styles.title}>Chào mừng đến với GymFit</Text>
         <Text style={styles.subtitle}>Đăng nhập để bắt đầu tập luyện</Text>
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email hoặc SĐT"
+          placeholderTextColor="#aaa"
+          value={emailOrPhone}
+          onChangeText={setEmailOrPhone}
+        />
+
+        <TextInput
+          style={styles.input}
+          placeholder="Mật khẩu"
+          placeholderTextColor="#aaa"
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Setup')}>
           <Text style={styles.buttonText}>Đăng nhập</Text>
@@ -43,6 +63,7 @@ export default function LoginScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -50,7 +71,7 @@ const styles = StyleSheet.create({
   },
   overlay: {
     ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.6)', // lớp mờ đen để chữ rõ hơn
+    backgroundColor: 'rgba(0,0,0,0.6)',
   },
   container: {
     padding: 24,
@@ -67,8 +88,18 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: '#ddd',
-    marginBottom: 32,
+    marginBottom: 24,
     textAlign: 'center',
+  },
+  input: {
+    width: '100%',
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    marginBottom: 12,
+    fontSize: 16,
+    color: '#000',
   },
   button: {
     backgroundColor: '#1E90FF',
