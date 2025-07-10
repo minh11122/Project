@@ -1,20 +1,21 @@
 import React from 'react';
 import {
+  ScrollView,
   View,
   Text,
   StyleSheet,
-  ScrollView,
-  Image,
   TouchableOpacity,
+  Image,
   FlatList,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 
 const { width } = Dimensions.get('window');
 
-const DiscoverScreen = () => {
-  const picksData = [
+const DATA = {
+  picksData: [
     {
       id: '1',
       title: 'Belly Fat Burner HIIT Beginner',
@@ -27,9 +28,8 @@ const DiscoverScreen = () => {
       duration: '15 min · Intermediate',
       image: 'https://storage.googleapis.com/a1aa/image/9ec03bae-8d04-489c-9303-b54f9e6e2045.jpg',
     },
-  ];
-
-  const beginnerWorkouts = [
+  ],
+  beginnerWorkouts: [
     {
       id: '1',
       title: 'Only 4 Moves for Abs',
@@ -45,9 +45,8 @@ const DiscoverScreen = () => {
       title: 'Arm Workout Push-Ups',
       image: 'https://storage.googleapis.com/a1aa/image/a06de38f-04e8-47ef-afc2-264c8b37f5e0.jpg',
     },
-  ];
-
-  const fastWorkouts = [
+  ],
+  fastWorkouts: [
     {
       id: '1',
       title: '4 Min Tabata',
@@ -60,9 +59,8 @@ const DiscoverScreen = () => {
       duration: '6 min · Beginner',
       image: 'https://storage.googleapis.com/a1aa/image/1a4fd399-2587-4d5a-dbb2-613a96c2a467.jpg',
     },
-  ];
-
-  const challenges = [
+  ],
+  challenges: [
     {
       id: '1',
       title: 'Plank Challenge',
@@ -78,9 +76,8 @@ const DiscoverScreen = () => {
       title: 'Killer Chest Advanced',
       image: 'https://storage.googleapis.com/a1aa/image/1a19f58f-0cc0-4832-e25b-e9a4910c9ec0.jpg',
     },
-  ];
-
-  const bodyFocusData = [
+  ],
+  bodyFocusData: [
     {
       id: '1',
       title: 'Full Body Stretching',
@@ -101,15 +98,16 @@ const DiscoverScreen = () => {
       title: 'Sleepy Time Stretching',
       image: 'https://storage.googleapis.com/a1aa/image/7cd2ee6f-b087-4466-c9ba-727b04c683af.jpg',
     },
-  ];
-
-  const bodyFocusButtons = [
+  ],
+  bodyFocusButtons: [
     { id: '1', title: 'Chest', icon: 'dumbbell' },
     { id: '2', title: 'Arm & Shoulder', icon: 'fist-raised' },
     { id: '3', title: 'Butt & Leg', icon: 'running' },
     { id: '4', title: 'Six pack', icon: 'fire' },
-  ];
+  ],
+};
 
+const DiscoverScreen = () => {
   const renderPickItem = ({ item }) => (
     <TouchableOpacity style={styles.pickItem}>
       <Image source={{ uri: item.image }} style={styles.pickImage} />
@@ -148,7 +146,7 @@ const DiscoverScreen = () => {
     </TouchableOpacity>
   );
 
-  const renderBodyFocusItem = ({ item, index }) => (
+  const renderBodyFocusItem = ({ item }) => (
     <TouchableOpacity style={styles.bodyFocusItem}>
       <Image source={{ uri: item.image }} style={styles.bodyFocusImage} />
       <Text style={styles.bodyFocusTitle}>{item.title}</Text>
@@ -158,177 +156,215 @@ const DiscoverScreen = () => {
   const renderBodyFocusButton = ({ item }) => (
     <TouchableOpacity style={styles.focusButton}>
       <Text style={styles.focusButtonText}>{item.title}</Text>
-      <Icon name={item.icon} size={24} color="#fff" />
+      <Icon name={item.icon} size={24} color={colors.card} />
     </TouchableOpacity>
   );
 
+  const Header = () => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>DISCOVER</Text>
+      <View style={styles.headerIcons}>
+        <TouchableOpacity style={styles.iconButton}>
+          <Icon name="search" size={20} color={colors.text} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton}>
+          <Icon name="clock" size={20} color={colors.text} />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>DISCOVER</Text>
-        <View style={styles.headerIcons}>
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="search" size={20} color="#000" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.iconButton}>
-            <Icon name="clock" size={20} color="#000" />
-          </TouchableOpacity>
-        </View>
+    <SafeAreaView style={styles.container}>
+      {/* Fixed Header */}
+      <View style={styles.fixedHeaderContainer}>
+        <Header />
       </View>
 
-      {/* Main Banner */}
-      <View style={styles.mainBanner}>
-        <Image
-          source={{
-            uri: 'https://storage.googleapis.com/a1aa/image/3e61b7b5-898b-4e90-ce14-73c282925be2.jpg',
-          }}
-          style={styles.bannerImage}
-        />
-        <View style={styles.bannerOverlay}>
-          <Text style={styles.bannerTitle}>Only 4 Moves for Abs</Text>
-          <Text style={styles.bannerSubtitle}>
-            4 simple exercises only! Burn belly fat and firm your abs. Get a flat belly fast!
-          </Text>
-        </View>
-      </View>
-
-      {/* Picks for you */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Picks for you</Text>
-        <FlatList
-          data={picksData}
-          renderItem={renderPickItem}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-        />
-      </View>
-
-      {/* Stay Active Banner */}
-      <View style={styles.stayActiveBanner}>
-        <Image
-          source={{
-            uri: 'https://storage.googleapis.com/a1aa/image/f499f09d-92a2-4625-7255-26f77f03794d.jpg',
-          }}
-          style={styles.stayActiveBannerImage}
-        />
-        <View style={styles.stayActiveBannerOverlay}>
-          <Text style={styles.stayActiveBannerTitle}>Stay active,{'\n'}stay in shape</Text>
-          <Text style={styles.stayActiveBannerSubtitle}>5 workouts</Text>
-        </View>
-      </View>
-
-      {/* For beginners */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>For beginners</Text>
-        <FlatList
-          data={beginnerWorkouts}
-          renderItem={renderBeginnerCard}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalList}
-        />
-      </View>
-
-      {/* Fast workout */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Fast workout</Text>
-        <FlatList
-          data={fastWorkouts}
-          renderItem={renderFastWorkout}
-          keyExtractor={(item) => item.id}
-          scrollEnabled={false}
-        />
-      </View>
-
-      {/* Challenge */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Challenge</Text>
-        <FlatList
-          data={challenges}
-          renderItem={renderChallenge}
-          keyExtractor={(item) => item.id}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.horizontalList}
-        />
-      </View>
-
-      {/* With equipment */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>With equipment</Text>
-        <View style={styles.equipmentContainer}>
+      {/* Scrollable Content */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Main Banner */}
+        <View style={styles.mainBanner}>
           <Image
             source={{
-              uri: 'https://storage.googleapis.com/a1aa/image/92f702eb-2777-4680-46b5-0aaba09b0310.jpg',
+              uri: 'https://storage.googleapis.com/a1aa/image/3e61b7b5-898b-4e90-ce14-73c282925be2.jpg',
             }}
-            style={styles.equipmentImage}
+            style={styles.bannerImage}
           />
-          <TouchableOpacity style={styles.equipmentButton}>
-            <Icon name="chevron-right" size={16} color="#fff" />
-          </TouchableOpacity>
+          <View style={styles.bannerOverlay}>
+            <Text style={styles.bannerTitle}>Only 4 Moves for Abs</Text>
+            <Text style={styles.bannerSubtitle}>
+              4 simple exercises only! Burn belly fat and firm your abs. Get a flat belly fast!
+            </Text>
+          </View>
         </View>
-      </View>
 
-      {/* Body focus exercises */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Body focus</Text>
-        <FlatList
-          data={bodyFocusData}
-          renderItem={renderBodyFocusItem}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.bodyFocusRow}
-        />
-      </View>
+        {/* Picks for you */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Picks for you</Text>
+          <FlatList
+            data={DATA.picksData}
+            renderItem={renderPickItem}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        </View>
 
-      {/* Body focus buttons */}
-      <View style={styles.section}>
-        <FlatList
-          data={bodyFocusButtons}
-          renderItem={renderBodyFocusButton}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-          scrollEnabled={false}
-          columnWrapperStyle={styles.focusButtonRow}
-        />
-      </View>
-    </ScrollView>
+        {/* Stay Active Banner */}
+        <View style={styles.stayActiveBanner}>
+          <Image
+            source={{
+              uri: 'https://storage.googleapis.com/a1aa/image/f499f09d-92a2-4625-7255-26f77f03794d.jpg',
+            }}
+            style={styles.stayActiveBannerImage}
+          />
+          <View style={styles.stayActiveBannerOverlay}>
+            <Text style={styles.stayActiveBannerTitle}>Stay active,{'\n'}stay in shape</Text>
+            <Text style={styles.stayActiveBannerSubtitle}>5 workouts</Text>
+          </View>
+        </View>
+
+        {/* For beginners */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>For beginners</Text>
+          <FlatList
+            data={DATA.beginnerWorkouts}
+            renderItem={renderBeginnerCard}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+          />
+        </View>
+
+        {/* Fast workout */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Fast workout</Text>
+          <FlatList
+            data={DATA.fastWorkouts}
+            renderItem={renderFastWorkout}
+            keyExtractor={(item) => item.id}
+            scrollEnabled={false}
+          />
+        </View>
+
+        {/* Challenge */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Challenge</Text>
+          <FlatList
+            data={DATA.challenges}
+            renderItem={renderChallenge}
+            keyExtractor={(item) => item.id}
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.horizontalList}
+          />
+        </View>
+
+        {/* With equipment */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>With equipment</Text>
+          <View style={styles.equipmentContainer}>
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/a1aa/image/92f702eb-2777-4680-46b5-0aaba09b0310.jpg',
+              }}
+              style={styles.equipmentImage}
+            />
+            <TouchableOpacity style={styles.equipmentButton}>
+              <Icon name="chevron-right" size={16} color={colors.card} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Body focus exercises */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Body focus</Text>
+          <FlatList
+            data={DATA.bodyFocusData}
+            renderItem={renderBodyFocusItem}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.bodyFocusRow}
+          />
+        </View>
+
+        {/* Body focus buttons */}
+        <View style={styles.section}>
+          <FlatList
+            data={DATA.bodyFocusButtons}
+            renderItem={renderBodyFocusButton}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            scrollEnabled={false}
+            columnWrapperStyle={styles.focusButtonRow}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
+};
+
+const colors = {
+  primary: '#2563eb',
+  secondary: '#9ca3af',
+  background: '#f9fafb',
+  card: '#fff',
+  text: '#000',
+  muted: '#6b7280',
+  border: '#e5e7eb',
+  accent: '#f9d8a6',
+  accentText: '#6b4b00',
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    paddingHorizontal: 16,
+    backgroundColor: colors.background,
+  },
+  fixedHeaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: colors.background,
+    paddingTop: 0,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 16,
-    paddingBottom: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: '800',
-    color: '#000',
+    color: colors.text,
   },
   headerIcons: {
     flexDirection: 'row',
     gap: 16,
   },
   iconButton: {
-    padding: 4,
+    padding: 8,
+    backgroundColor: colors.border,
+    borderRadius: 12,
+  },
+  scrollContent: {
+    paddingTop: 60, // Adjust based on header height
+    paddingHorizontal: 16,
   },
   mainBanner: {
     position: 'relative',
     borderRadius: 24,
     overflow: 'hidden',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   bannerImage: {
     width: '100%',
@@ -349,13 +385,13 @@ const styles = StyleSheet.create({
   bannerTitle: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#fff',
+    color: colors.card,
     lineHeight: 36,
     marginBottom: 8,
   },
   bannerSubtitle: {
     fontSize: 18,
-    color: '#fff',
+    color: colors.card,
     fontWeight: '400',
   },
   section: {
@@ -363,15 +399,15 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
-    color: '#1e293b',
+    fontWeight: '800',
+    color: colors.text,
     marginBottom: 12,
   },
   pickItem: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: colors.border,
     paddingBottom: 12,
     marginBottom: 24,
   },
@@ -388,19 +424,19 @@ const styles = StyleSheet.create({
   pickTitle: {
     fontSize: 16,
     fontWeight: '800',
-    color: '#000',
+    color: colors.text,
     lineHeight: 20,
   },
   pickDuration: {
     fontSize: 14,
-    color: '#6b7280',
+    color: colors.muted,
     marginTop: 4,
   },
   stayActiveBanner: {
     position: 'relative',
     borderRadius: 24,
     overflow: 'hidden',
-    marginBottom: 32,
+    marginBottom: 24,
   },
   stayActiveBannerImage: {
     width: '100%',
@@ -421,13 +457,13 @@ const styles = StyleSheet.create({
   stayActiveBannerTitle: {
     fontSize: 30,
     fontWeight: '800',
-    color: '#fff',
+    color: colors.card,
     lineHeight: 36,
     marginBottom: 8,
   },
   stayActiveBannerSubtitle: {
     fontSize: 18,
-    color: '#fff',
+    color: colors.card,
   },
   horizontalList: {
     gap: 16,
@@ -453,7 +489,7 @@ const styles = StyleSheet.create({
     borderRadius: 24,
   },
   cardText: {
-    color: '#fff',
+    color: colors.card,
     fontSize: 16,
     fontWeight: '800',
     lineHeight: 20,
@@ -462,7 +498,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
+    borderBottomColor: colors.border,
     paddingBottom: 12,
     marginBottom: 16,
   },
@@ -479,12 +515,12 @@ const styles = StyleSheet.create({
   fastWorkoutTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#000',
+    color: colors.text,
     lineHeight: 20,
   },
   fastWorkoutDuration: {
     fontSize: 14,
-    color: '#9ca3af',
+    color: colors.muted,
     marginTop: 4,
   },
   challengeItem: {
@@ -504,7 +540,7 @@ const styles = StyleSheet.create({
     left: 12,
   },
   challengeText: {
-    color: '#fff',
+    color: colors.card,
     fontSize: 16,
     fontWeight: '700',
     lineHeight: 20,
@@ -526,7 +562,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     right: 16,
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.primary,
     width: 40,
     height: 40,
     borderRadius: 20,
@@ -550,7 +586,7 @@ const styles = StyleSheet.create({
   bodyFocusTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#000',
+    color: colors.text,
     marginTop: 8,
     lineHeight: 20,
   },
@@ -568,7 +604,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   focusButtonText: {
-    color: '#fff',
+    color: colors.card,
     fontSize: 18,
     fontWeight: '600',
   },

@@ -24,7 +24,7 @@ const ReportScreen = () => {
   const ReportItem = ({ icon, number, label }) => (
     <View style={styles.reportItem}>
       <View style={styles.iconContainer}>
-        <Ionicons name={icon} size={22} color="black" />
+        <Ionicons name={icon} size={22} color={colors.text} />
         <View style={styles.iconBadge} />
       </View>
       <Text style={styles.reportNumber}>{number}</Text>
@@ -72,209 +72,243 @@ const ReportScreen = () => {
     </View>
   );
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-        <View style={styles.content}>
-          <Text style={styles.header}>REPORT</Text>
+  const Header = () => (
+    <View style={styles.header}>
+      <Text style={styles.headerTitle}>REPORT</Text>
+    </View>
+  );
 
-          {/* Summary Section */}
-          <View style={styles.reportBox}>
-            <ReportItem icon="medal" number="0" label="Workout" />
-            <ReportItem icon="water" number="0" label="Kcal" />
-            <ReportItem icon="time" number="0" label="Minute" />
+  return (
+    <SafeAreaView style={styles.container}>
+      {/* Fixed Header */}
+      <View style={styles.fixedHeaderContainer}>
+        <Header />
+      </View>
+
+      {/* Scrollable Content */}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
+        {/* Summary Section */}
+        <View style={styles.reportBox}>
+          <ReportItem icon="medal" number="0" label="Workout" />
+          <ReportItem icon="water" number="0" label="Kcal" />
+          <ReportItem icon="time" number="0" label="Minute" />
+        </View>
+
+        {/* History Section */}
+        <View style={styles.historyHeader}>
+          <Text style={styles.sectionTitle}>History</Text>
+          <TouchableOpacity>
+            <Text style={styles.allRecordsLink}>All records</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.historyBox}>
+          {/* Weekdays */}
+          <View style={styles.weekdays}>
+            {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
+              <Text key={index} style={styles.weekdayText}>{day}</Text>
+            ))}
           </View>
 
-          {/* History Section */}
-          <View style={styles.historyHeader}>
-            <Text style={styles.historyTitle}>History</Text>
-            <TouchableOpacity>
-              <Text style={styles.allRecordsLink}>All records</Text>
+          {/* Dates */}
+          <View style={styles.dates}>
+            <CalendarDay day="22" />
+            <CalendarDay day="23" />
+            <CalendarDay day="24" />
+            <CalendarDay day="25" />
+            <CalendarDay day="26" isActive />
+            <CalendarDay day="27" isInactive />
+            <CalendarDay day="28" isInactive />
+          </View>
+
+          {/* Day Streak */}
+          <View style={styles.dayStreak}>
+            <Text style={styles.dayStreakText}>Day Streak</Text>
+            <Ionicons name="flame" size={18} color="#ef4444" />
+            <Text style={styles.dayStreakNumber}>0</Text>
+          </View>
+        </View>
+
+        {/* Weight Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Weight</Text>
+            <TouchableOpacity style={styles.logButton}>
+              <Text style={styles.logButtonText}>Log</Text>
             </TouchableOpacity>
           </View>
 
           <View style={styles.historyBox}>
-            {/* Weekdays */}
-            <View style={styles.weekdays}>
-              {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-                <Text key={index} style={styles.weekdayText}>{day}</Text>
-              ))}
-            </View>
-            
-            {/* Dates */}
-            <View style={styles.dates}>
-              <CalendarDay day="22" />
-              <CalendarDay day="23" />
-              <CalendarDay day="24" />
-              <CalendarDay day="25" />
-              <CalendarDay day="26" isActive />
-              <CalendarDay day="27" isInactive />
-              <CalendarDay day="28" isInactive />
-            </View>
-
-            {/* Day Streak */}
-            <View style={styles.dayStreak}>
-              <Text style={styles.dayStreakText}>Day Streak</Text>
-              <Ionicons name="flame" size={18} color="#ef4444" />
-              <Text style={styles.dayStreakNumber}>0</Text>
-            </View>
-          </View>
-
-          {/* Weight Section */}
-          <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Weight</Text>
-              <TouchableOpacity style={styles.logButton}>
-                <Text style={styles.logButtonText}>Log</Text>
-              </TouchableOpacity>
-            </View>
-
-            <View style={styles.historyBox}>
-              <View style={styles.stats}>
-                <View style={styles.statsLeft}>
-                  <Text style={styles.statsLabel}>Current</Text>
-                  <Text style={styles.statsValue}>{currentWeight}</Text>
-                </View>
-                <View style={styles.statsRight}>
-                  <Text style={styles.statsLabel}>Heaviest</Text>
-                  <Text style={styles.statsValue}>{heaviestWeight}</Text>
-                  <Text style={styles.statsLabel}>Lightest</Text>
-                  <Text style={styles.statsValue}>{lightestWeight}</Text>
-                </View>
+            <View style={styles.stats}>
+              <View style={styles.statsLeft}>
+                <Text style={styles.statsLabel}>Current</Text>
+                <Text style={styles.statsValue}>{currentWeight}</Text>
               </View>
-              <WeightChart />
-            </View>
-          </View>
-
-          {/* Progress Bar */}
-          <View style={styles.progressBarBg} />
-
-          {/* BMI Section */}
-          <View style={styles.bmiContainer}>
-            <View style={styles.bmiHeader}>
-              <Text style={styles.bmiTitle}>BMI</Text>
-              <TouchableOpacity style={styles.editButton}>
-                <Text style={styles.editButtonText}>Edit</Text>
-              </TouchableOpacity>
-            </View>
-            <Text style={styles.bmiValue}>{bmiValue}</Text>
-            <BMIColorBar />
-            <View style={styles.scaleLabels}>
-              {['15', '16', '18.5', '25', '30', '35', '40'].map((label, index) => (
-                <Text key={index} style={styles.scaleLabel}>{label}</Text>
-              ))}
-            </View>
-            <View style={styles.heightRow}>
-              <Text style={styles.heightText}>Height</Text>
-              <TouchableOpacity style={styles.heightEdit}>
-                <Text style={styles.heightEditText}>Edit</Text>
-                <Ionicons name="pencil" size={10} color="#6b7280" />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Image Advertisement Section */}
-          <View style={styles.imageSection}>
-            <ImageBackground
-              source={{
-                uri: 'https://storage.googleapis.com/a1aa/image/ad6c185a-4ca3-43b4-fb77-bc2e4821e76d.jpg'
-              }}
-              style={styles.backgroundImage}
-              imageStyle={styles.backgroundImageStyle}
-            >
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/a1aa/image/1aa2a23d-4b6a-4413-df09-a1b2093f51f9.jpg'
-                }}
-                style={styles.circleImage}
-              />
-              <View style={styles.weeksLabel}>
-                <Text style={styles.weeksText}>4 WEEKS</Text>
+              <View style={styles.statsRight}>
+                <Text style={styles.statsLabel}>Heaviest</Text>
+                <Text style={styles.statsValue}>{heaviestWeight}</Text>
+                <Text style={styles.statsLabel}>Lightest</Text>
+                <Text style={styles.statsValue}>{lightestWeight}</Text>
               </View>
-              <LinearGradient
-                colors={['transparent', 'rgba(0,0,0,0.8)']}
-                style={styles.imageGradient}
-              />
-              <Text style={styles.jawlineText}>GET A CHISELED JAWLINE</Text>
-            </ImageBackground>
-          </View>
-
-          {/* Ad Details Section */}
-          <View style={styles.adSection}>
-            <View style={styles.adHeader}>
-              <View style={styles.adLabel}>
-                <Text style={styles.adLabelText}>AD</Text>
-              </View>
-              <Image
-                source={{
-                  uri: 'https://storage.googleapis.com/a1aa/image/0714f18b-0fd1-464a-d9d4-088d1f7d5739.jpg'
-                }}
-                style={styles.adIcon}
-              />
-              <Text style={styles.adTitle}>Jawline Exercises - Face Yoga</Text>
             </View>
-            <Text style={styles.adDesc}>
-              Face exercise & face yoga for jawline. Reduce double chin & lose face fat.
-            </Text>
+            <WeightChart />
           </View>
-
-          {/* Install Button */}
-          <LinearGradient
-            colors={['#f43f5e', '#ec4899']}
-            style={styles.installButton}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-          >
-            <TouchableOpacity style={styles.installButtonTouchable}>
-              <Text style={styles.installButtonText}>INSTALL</Text>
-            </TouchableOpacity>
-          </LinearGradient>
         </View>
+
+        {/* Progress Bar */}
+        <View style={styles.progressBarBg} />
+
+        {/* BMI Section */}
+        <View style={styles.bmiContainer}>
+          <View style={styles.bmiHeader}>
+            <Text style={styles.sectionTitle}>BMI</Text>
+            <TouchableOpacity style={styles.editButton}>
+              <Text style={styles.editButtonText}>Edit</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.bmiValue}>{bmiValue}</Text>
+          <BMIColorBar />
+          <View style={styles.scaleLabels}>
+            {['15', '16', '18.5', '25', '30', '35', '40'].map((label, index) => (
+              <Text key={index} style={styles.scaleLabel}>{label}</Text>
+            ))}
+          </View>
+          <View style={styles.heightRow}>
+            <Text style={styles.heightText}>Height</Text>
+            <TouchableOpacity style={styles.heightEdit}>
+              <Text style={styles.heightEditText}>Edit</Text>
+              <Ionicons name="pencil" size={10} color={colors.muted} />
+            </TouchableOpacity>
+          </View>
+        </View>
+
+        {/* Image Advertisement Section */}
+        <View style={styles.imageSection}>
+          <ImageBackground
+            source={{
+              uri: 'https://storage.googleapis.com/a1aa/image/ad6c185a-4ca3-43b4-fb77-bc2e4821e76d.jpg',
+            }}
+            style={styles.backgroundImage}
+            imageStyle={styles.backgroundImageStyle}
+          >
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/a1aa/image/1aa2a23d-4b6a-4413-df09-a1b2093f51f9.jpg',
+              }}
+              style={styles.circleImage}
+            />
+            <View style={styles.weeksLabel}>
+              <Text style={styles.weeksText}>4 WEEKS</Text>
+            </View>
+            <LinearGradient
+              colors={['transparent', 'rgba(0,0,0,0.8)']}
+              style={styles.imageGradient}
+            />
+            <Text style={styles.jawlineText}>GET A CHISELED JAWLINE</Text>
+          </ImageBackground>
+        </View>
+
+        {/* Ad Details Section */}
+        <View style={styles.adSection}>
+          <View style={styles.adHeader}>
+            <View style={styles.adLabel}>
+              <Text style={styles.adLabelText}>AD</Text>
+            </View>
+            <Image
+              source={{
+                uri: 'https://storage.googleapis.com/a1aa/image/0714f18b-0fd1-464a-d9d4-088d1f7d5739.jpg',
+              }}
+              style={styles.adIcon}
+            />
+            <Text style={styles.adTitle}>Jawline Exercises - Face Yoga</Text>
+          </View>
+          <Text style={styles.adDesc}>
+            Face exercise & face yoga for jawline. Reduce double chin & lose face fat.
+          </Text>
+        </View>
+
+        {/* Install Button */}
+        <LinearGradient
+          colors={['#f43f5e', '#ec4899']}
+          style={styles.installButton}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 0 }}
+        >
+          <TouchableOpacity style={styles.installButtonTouchable}>
+            <Text style={styles.installButtonText}>INSTALL</Text>
+          </TouchableOpacity>
+        </LinearGradient>
       </ScrollView>
     </SafeAreaView>
   );
 };
 
+const colors = {
+  primary: '#2563eb',
+  secondary: '#9ca3af',
+  background: '#f9fafb',
+  card: '#fff',
+  text: '#000',
+  muted: '#6b7280',
+  border: '#e5e7eb',
+  accent: '#f9d8a6',
+  accentText: '#6b4b00',
+};
+
 const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#f9fafb',
-  },
   container: {
     flex: 1,
+    backgroundColor: colors.background,
   },
-  content: {
-    backgroundColor: 'white',
-    borderRadius: 24,
-    padding: 24,
-    margin: 24,
-    maxWidth: 400,
-    alignSelf: 'center',
-    width: width - 48,
+  fixedHeaderContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 10,
+    backgroundColor: colors.background,
+    paddingTop: 0,
   },
   header: {
-    fontWeight: '800',
-    fontSize: 18,
-    color: 'black',
-    marginBottom: 16,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
   },
-  
-  // Report Box
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '800',
+    color: colors.text,
+  },
+  scrollContent: {
+    paddingTop: 60, // Adjust based on header height
+    paddingHorizontal: 20,
+    paddingBottom: 40,
+  },
   reportBox: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderRadius: 24,
     padding: 20,
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: 24,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   reportItem: {
     alignItems: 'center',
-    width: 80,
+    width: (width - 80) / 3,
   },
   iconContainer: {
     position: 'relative',
-    marginBottom: 4,
+    marginBottom: 8,
   },
   iconBadge: {
     position: 'absolute',
@@ -282,41 +316,44 @@ const styles = StyleSheet.create({
     right: -4,
     width: 12,
     height: 12,
-    backgroundColor: '#a5b4fc',
+    backgroundColor: colors.accent,
     borderRadius: 6,
   },
   reportNumber: {
     fontWeight: '800',
     fontSize: 28,
-    color: 'black',
+    color: colors.text,
   },
   reportLabel: {
     fontSize: 12,
-    color: '#6b7280',
+    color: colors.muted,
   },
-
-  // History Section
   historyHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: 12,
   },
-  historyTitle: {
-    fontWeight: '600',
-    fontSize: 14,
-    color: 'black',
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: colors.text,
   },
   allRecordsLink: {
-    fontWeight: '600',
     fontSize: 14,
-    color: '#2563eb',
+    fontWeight: '600',
+    color: colors.primary,
   },
   historyBox: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 12,
+    backgroundColor: colors.card,
+    borderRadius: 24,
     padding: 16,
-    marginBottom: 16,
+    marginBottom: 24,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   weekdays: {
     flexDirection: 'row',
@@ -325,14 +362,14 @@ const styles = StyleSheet.create({
   weekdayText: {
     fontWeight: '600',
     fontSize: 10,
-    color: '#9ca3af',
+    color: colors.secondary,
     textAlign: 'center',
-    width: 20,
+    width: 24,
   },
   dates: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 4,
+    marginTop: 8,
   },
   dateContainer: {
     width: 24,
@@ -343,14 +380,14 @@ const styles = StyleSheet.create({
   dateText: {
     fontWeight: '600',
     fontSize: 12,
-    color: '#4b5563',
+    color: colors.text,
   },
   inactiveDate: {
-    color: '#d1d5db',
+    color: colors.border,
   },
   activeDate: {
-    borderWidth: 1.5,
-    borderColor: '#3b82f6',
+    borderWidth: 2,
+    borderColor: colors.primary,
     borderRadius: 12,
     width: 24,
     height: 24,
@@ -360,7 +397,7 @@ const styles = StyleSheet.create({
   activeDateText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#2563eb',
+    color: colors.primary,
   },
   dayStreak: {
     flexDirection: 'row',
@@ -371,37 +408,30 @@ const styles = StyleSheet.create({
   dayStreakText: {
     fontWeight: '600',
     fontSize: 14,
-    color: '#4b5563',
+    color: colors.muted,
   },
   dayStreakNumber: {
     fontWeight: '600',
     fontSize: 14,
-    color: '#4b5563',
+    color: colors.muted,
   },
-
-  // Weight Section
   section: {
-    marginTop: 32,
+    marginBottom: 24,
   },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
-  },
-  sectionTitle: {
-    fontWeight: '600',
-    fontSize: 14,
-    color: '#1f2937',
+    marginBottom: 12,
   },
   logButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingVertical: 6,
     paddingHorizontal: 20,
   },
   logButtonText: {
-    color: 'white',
+    color: colors.card,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -419,12 +449,12 @@ const styles = StyleSheet.create({
   },
   statsLabel: {
     fontSize: 12,
-    color: '#4b5563',
+    color: colors.muted,
   },
   statsValue: {
-    fontSize: 12,
+    fontSize: 14,
     fontWeight: '600',
-    color: 'black',
+    color: colors.text,
   },
   chartContainer: {
     marginBottom: 12,
@@ -434,9 +464,8 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   chartLabel: {
-    fontFamily: 'monospace',
     fontSize: 10,
-    color: '#d1d5db',
+    color: colors.border,
   },
   chartDates: {
     flexDirection: 'row',
@@ -444,23 +473,24 @@ const styles = StyleSheet.create({
   },
   chartDate: {
     fontSize: 10,
-    color: '#9ca3af',
+    color: colors.secondary,
   },
-
-  // Progress Bar
   progressBarBg: {
     height: 8,
-    backgroundColor: '#f3f4f6',
+    backgroundColor: colors.border,
     borderRadius: 4,
     marginBottom: 24,
   },
-
-  // BMI Section
   bmiContainer: {
-    backgroundColor: '#f9fafb',
-    borderRadius: 16,
+    backgroundColor: colors.card,
+    borderRadius: 24,
     padding: 16,
     marginBottom: 24,
+    shadowColor: colors.text,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   bmiHeader: {
     flexDirection: 'row',
@@ -468,26 +498,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 12,
   },
-  bmiTitle: {
-    fontWeight: '800',
-    fontSize: 14,
-    color: 'black',
-  },
   editButton: {
-    backgroundColor: '#2563eb',
+    backgroundColor: colors.primary,
     borderRadius: 20,
     paddingVertical: 4,
     paddingHorizontal: 16,
   },
   editButtonText: {
-    color: 'white',
+    color: colors.card,
     fontWeight: '600',
     fontSize: 12,
   },
   bmiValue: {
     fontWeight: '800',
     fontSize: 20,
-    color: 'black',
+    color: colors.text,
     marginBottom: 12,
   },
   colorBar: {
@@ -497,7 +522,7 @@ const styles = StyleSheet.create({
   },
   colorSegment: {
     height: 12,
-    width: 24,
+    flex: 1,
     borderRadius: 4,
   },
   blueDark: { backgroundColor: '#2563eb' },
@@ -514,7 +539,7 @@ const styles = StyleSheet.create({
   scaleLabel: {
     fontSize: 10,
     fontWeight: '600',
-    color: '#6b7280',
+    color: colors.muted,
   },
   heightRow: {
     flexDirection: 'row',
@@ -524,7 +549,7 @@ const styles = StyleSheet.create({
   heightText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#6b7280',
+    color: colors.muted,
   },
   heightEdit: {
     flexDirection: 'row',
@@ -534,12 +559,10 @@ const styles = StyleSheet.create({
   heightEditText: {
     fontSize: 12,
     fontWeight: '500',
-    color: '#6b7280',
+    color: colors.muted,
   },
-
-  // Image Section
   imageSection: {
-    borderRadius: 12,
+    borderRadius: 24,
     overflow: 'hidden',
     height: 150,
     marginBottom: 16,
@@ -550,7 +573,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   backgroundImageStyle: {
-    borderRadius: 12,
+    borderRadius: 24,
   },
   circleImage: {
     position: 'absolute',
@@ -560,19 +583,19 @@ const styles = StyleSheet.create({
     height: 80,
     borderRadius: 40,
     borderWidth: 2,
-    borderColor: 'white',
+    borderColor: colors.card,
   },
   weeksLabel: {
     position: 'absolute',
     bottom: 16,
     left: 96,
-    backgroundColor: '#a3e635',
-    borderRadius: 4,
-    paddingVertical: 2,
-    paddingHorizontal: 8,
+    backgroundColor: colors.accent,
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 12,
   },
   weeksText: {
-    color: 'black',
+    color: colors.accentText,
     fontWeight: '800',
     fontSize: 12,
   },
@@ -582,80 +605,75 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     height: 80,
-    borderRadius: 12,
+    borderRadius: 24,
   },
   jawlineText: {
     position: 'absolute',
     bottom: 16,
     left: 16,
     right: 16,
-    color: 'white',
+    color: colors.card,
     fontWeight: '800',
     fontSize: 18,
     lineHeight: 20,
   },
-
-  // Ad Section
   adSection: {
-    backgroundColor: 'white',
-    borderRadius: 12,
-    shadowColor: '#000',
+    backgroundColor: colors.card,
+    borderRadius: 24,
+    marginBottom: 16,
+    shadowColor: colors.text,
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 3,
     elevation: 2,
-    overflow: 'hidden',
-    marginBottom: 16,
   },
   adHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     borderBottomWidth: 1,
-    borderBottomColor: '#e5e7eb',
-    padding: 8,
+    borderBottomColor: colors.border,
+    padding: 12,
   },
   adLabel: {
-    backgroundColor: '#2563eb',
-    borderRadius: 4,
-    paddingVertical: 2,
-    paddingHorizontal: 6,
+    backgroundColor: colors.primary,
+    borderRadius: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
     marginRight: 8,
   },
   adLabelText: {
-    color: 'white',
+    color: colors.card,
     fontWeight: '700',
     fontSize: 10,
   },
   adIcon: {
     width: 30,
     height: 30,
-    borderRadius: 4,
+    borderRadius: 8,
     marginRight: 8,
   },
   adTitle: {
     fontWeight: '600',
-    fontSize: 14,
-    color: 'black',
+    fontSize: 16,
+    color: colors.text,
     flex: 1,
   },
   adDesc: {
-    fontSize: 12,
-    color: '#4b5563',
+    fontSize: 14,
+    color: colors.muted,
     padding: 12,
-    lineHeight: 16,
+    lineHeight: 20,
   },
-
-  // Install Button
   installButton: {
     borderRadius: 25,
-    marginTop: 16,
+    marginBottom: 16,
   },
   installButtonTouchable: {
     paddingVertical: 12,
     alignItems: 'center',
   },
   installButtonText: {
-    color: 'white',
+    color: colors.card,
     fontWeight: '600',
     fontSize: 14,
   },
