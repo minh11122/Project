@@ -1,9 +1,32 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, TextInput, Alert } from 'react-native';
+import auServices from '../../services/AuServices'; // Adjust the import path as needed
 
 export default function LoginScreen({ navigation }) {
   const [emailOrPhone, setEmailOrPhone] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async () => {
+    if (!emailOrPhone || !password) {
+      Alert.alert('Lỗi', 'Vui lòng nhập email/số điện thoại và mật khẩu');
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const response = await auServices.login(emailOrPhone, password);
+      // Assuming the API returns a token or user data on successful login
+      console.log('Login successful:', response);
+      // Navigate to the Setup screen or handle the response as needed
+      navigation.navigate('Setup');
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Lỗi đăng nhập', error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -23,6 +46,7 @@ export default function LoginScreen({ navigation }) {
           placeholderTextColor="#aaa"
           value={emailOrPhone}
           onChangeText={setEmailOrPhone}
+          autoCapitalize="none"
         />
 
         <TextInput
@@ -34,8 +58,12 @@ export default function LoginScreen({ navigation }) {
           onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Setup')}>
-          <Text style={styles.buttonText}>Đăng nhập</Text>
+        <TouchableOpacity
+          style={[styles.button, loading && styles.buttonDisabled]}
+          onPress={handleLogin}
+          disabled={loading}
+        >
+          <Text style={styles.buttonText}>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Register')}>
@@ -107,6 +135,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     marginBottom: 12,
+  },
+  buttonDisabled: {
+    backgroundColor: '#87CEEB',
+    opacity: 0.7,
   },
   buttonText: {
     color: '#fff',
