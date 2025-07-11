@@ -1,7 +1,7 @@
-import axios from 'axios';
+import { URI_API } from '@env';
 
 const api = axios.create({
-    baseURL: 'http://localhost:7777/api/auth',
+    baseURL: URI_API,
     headers: {
         'Content-Type': 'application/json',
     },
@@ -9,7 +9,7 @@ const api = axios.create({
 
 const auServices = {
     login: async (username, password) => {
-        const response = await api.post('/signin', { username, password });
+        const response = await api.post('/api/auth/signin', { username, password });
         return response.data;
     },
 };

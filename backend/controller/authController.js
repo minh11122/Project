@@ -15,15 +15,15 @@ const login = async (req, res) => {
                 process.env.JWT_SECRET,
                 { expiresIn: '1h' }
             );
-            return res.status(200).json({ message: "Login successful", token });
+            return res.status(200).json({ message: "Đăng nhập thành công", token });
 
         } else {
-            return res.status(401).json({ message: "Invalid credentials" });
+            return res.status(401).json({ message: "Sai tài khoản hoặc mật khẩu" });
         }
 
     } catch (error) {
         console.error(error);
-        return res.status(500).json({ message: "Internal server error" });
+        return res.status(500).json({ message: "Lỗi đăng nhập" });
     }
 };
 
