@@ -1,4 +1,6 @@
-const User = require("../models/userSchema");
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
+const User = require("../models/userSchema ");
 
 const login = async (req, res) => {
     try {
@@ -8,15 +10,17 @@ const login = async (req, res) => {
             $or: [{ email: username }, { phone: username }]
         });
 
-        if (!user) {
-            return res.status(401).json({ message: "User not found" });
+        if (user && (await bcrypt.compare(password, user.password))) {
+            const token = jwt.sign({ userId: user._id },
+                process.env.JWT_SECRET,
+                { expiresIn: '1h' }
+            );
+            return res.status(200).json({ message: "Login successful", token });
+
+        } else {
+            return res.status(401).json({ message: "Invalid credentials" });
         }
 
-        if (user.password !== password) {
-            return res.status(401).json({ message: "Invalid password" });
-        }
-
-        return res.status(200).json({ message: "Login successful", user });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
