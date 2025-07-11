@@ -1,7 +1,7 @@
-import { URI_API } from '@env';
+import axios from 'axios';
 
 const api = axios.create({
-    baseURL: URI_API,
+    baseURL: 'https://project-xnuq.onrender.com/api',
     headers: {
         'Content-Type': 'application/json',
     },
@@ -9,7 +9,7 @@ const api = axios.create({
 
 const auServices = {
     login: async (username, password) => {
-        const response = await api.post('/api/auth/signin', { username, password });
+        const response = await api.post('/auth/signin', { username, password });
         return response.data;
     },
 };
