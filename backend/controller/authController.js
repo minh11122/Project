@@ -27,26 +27,6 @@ const login = async (req, res) => {
     }
 };
 
-const loginWithGoogle = async (req, res) => {
-    const { idToken } = req.body;
-
-    const ticket = await client.verifyIdToken({
-        idToken,
-        audience: process.env.GOOGLE_CLIENT_ID,
-    });
-
-    const { email, name } = ticket.getPayload();
-
-    let user = await User.findOne({ email });
-
-    if (!user) {
-        user = await User.create({ email, name });
-    }
-
-    return res.status(200).json({ message: "Login successful", user });
-};
-
 module.exports = {
-    login,
-    loginWithGoogle
+    login
 };
