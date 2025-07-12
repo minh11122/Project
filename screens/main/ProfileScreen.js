@@ -1,13 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
-export default function ProfileScreen({ navigation }) {
+const ProfileScreen = ({ navigation }) => {
+  const { colors } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState(i18n.language);
+
+  useEffect(() => {
+    const onLanguageChange = () => {
+      console.log('Language changed in ProfileScreen:', i18n.language);
+      setLanguage(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChange);
+    return () => i18n.off('languageChanged', onLanguageChange);
+  }, [i18n]);
+
   const Header = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>TRANG CÁ NHÂN</Text>
-      <TouchableOpacity>
-        <View style={styles.iconButton}>
+    <View style={styles(colors).header}>
+      <Text style={styles(colors).headerTitle}>{t('profile')}</Text>
+      <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+        <View style={styles(colors).iconButton}>
           <Ionicons name="settings-outline" size={20} color={colors.text} />
         </View>
       </TouchableOpacity>
@@ -15,59 +30,50 @@ export default function ProfileScreen({ navigation }) {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
-      <View style={styles.fixedHeaderContainer}>
+    <SafeAreaView style={styles(colors).container}>
+      <View style={styles(colors).fixedHeaderContainer}>
         <Header />
       </View>
-
-      {/* Scrollable Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles(colors).scrollContent}
       >
-        {/* Avatar & Info */}
-        <View style={styles.profileSection}>
-          <View style={styles.avatarContainer}>
+        <View style={styles(colors).profileSection}>
+          <View style={styles(colors).avatarContainer}>
             <Image
               source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
-              style={styles.avatar}
+              style={styles(colors).avatar}
             />
           </View>
-          <Text style={styles.name}>Nguyễn Văn A</Text>
-          <Text style={styles.email}>nguyenvana@example.com</Text>
+          <Text style={styles(colors).name}>{t('user_name')}</Text>
+          <Text style={styles(colors).email}>{t('user_email')}</Text>
         </View>
-
-        {/* Actions */}
-        <View style={styles.actions}>
-          <TouchableOpacity style={[styles.actionButton, styles.editButton]}>
-            <Text style={styles.buttonText}>Chỉnh sửa thông tin</Text>
+        <View style={styles(colors).actions}>
+          <TouchableOpacity
+            style={[styles(colors).actionButton, styles(colors).editButton]}
+            onPress={() => console.log('Edit profile pressed')}
+          >
+            <Text style={styles(colors).buttonText}>{t('edit_profile')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.goalButton]}>
-            <Text style={styles.buttonText}>Mục tiêu của tôi</Text>
+          <TouchableOpacity
+            style={[styles(colors).actionButton, styles(colors).goalButton]}
+            onPress={() => console.log('My goals pressed')}
+          >
+            <Text style={styles(colors).buttonText}>{t('my_goals')}</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.logoutButton]}>
-            <Text style={styles.buttonText}>Đăng xuất</Text>
+          <TouchableOpacity
+            style={[styles(colors).actionButton, styles(colors).logoutButton]}
+            onPress={() => console.log('Logout pressed')}
+          >
+            <Text style={styles(colors).buttonText}>{t('logout')}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
-}
-
-const colors = {
-  primary: '#2563eb',
-  secondary: '#9ca3af',
-  background: '#f9fafb',
-  card: '#fff',
-  text: '#000',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  accent: '#f9d8a6',
-  accentText: '#6b4b00',
 };
 
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -99,7 +105,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   scrollContent: {
-    paddingTop: 60, // Adjust based on header height
+    paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },
@@ -160,7 +166,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.accent,
   },
   logoutButton: {
-    backgroundColor: '#f87171',
+    backgroundColor: '#f87171', // Kept as static for distinct logout action
   },
   buttonText: {
     color: colors.card,
@@ -169,3 +175,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+export default ProfileScreen;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   ScrollView,
   View,
@@ -11,32 +11,34 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 const DATA = {
-  tabs: ['Bụng', 'Cánh tay', 'Ngực', 'Chân', 'Vai'],
-  goals: ['Xây dựng cơ bắp', 'Đốt cháy mỡ', 'Giữ dáng', 'Tăng sức bền'],
+  tabs: ['abs', 'arms', 'chest', 'legs', 'shoulders'],
+  goals: ['build_muscle', 'burn_fat', 'stay_fit', 'increase_endurance'],
   tags: [
-    { icon: '💪', text: 'Xây dựng cơ bắp' },
-    { icon: '📚', text: 'Nâng cao' },
-    { icon: '⏰', text: '<7 phút' },
-    { icon: '🔥', text: 'Đốt cháy mỡ' },
-    { icon: '⏰', text: '>15 phút' },
-    { icon: '⏰', text: '7-15 phút' },
+    { icon: '💪', text: 'build_muscle' },
+    { icon: '📚', text: 'advanced' },
+    { icon: '⏰', text: 'under_7_minutes' },
+    { icon: '🔥', text: 'burn_fat' },
+    { icon: '⏰', text: 'over_15_minutes' },
+    { icon: '⏰', text: '7_to_15_minutes' },
   ],
   challengeData: [
     {
       id: '1',
-      title: 'TOÀN THÂN\nTHỬ THÁCH 7X4',
-      description: 'Bắt đầu hành trình tạo dáng cơ thể để tập trung vào tất cả các nhóm cơ và xây dựng cơ thể mơ ước của bạn trong 4 tuần!',
+      title: 'full_body_challenge_7x4',
+      description: 'full_body_challenge_description',
       gradient: ['#0057ff', '#0041b3'],
       image: 'https://storage.googleapis.com/a1aa/image/34a3bda0-fc6a-428f-f56c-8fb12283c8f7.jpg',
     },
     {
       id: '2',
-      title: 'THÂN TRÊN\nTHỬ THÁCH 7X4',
-      description: 'Chỉ tập trung vào đôi cánh tay và ngực để tăng sức mạnh và nâng cao vóc dáng.',
+      title: 'upper_body_challenge_7x4',
+      description: 'upper_body_challenge_description',
       gradient: ['#00aaff', '#0088cc'],
       image: 'https://storage.googleapis.com/a1aa/image/066d54f1-8aaa-443d-4ed7-4a088edb3248.jpg',
     },
@@ -44,22 +46,22 @@ const DATA = {
   workoutData: [
     {
       id: '1',
-      title: 'Bụng Người bắt đầu',
-      duration: '20 phút · 16 Bài tập',
+      title: 'beginner_abs',
+      duration: 'beginner_abs_duration',
       difficulty: 1,
       image: 'https://storage.googleapis.com/a1aa/image/143f04bc-4a90-4c7e-e9e6-f80198c04fcf.jpg',
     },
     {
       id: '2',
-      title: 'Bụng Trung bình',
-      duration: '29 phút · 21 Bài tập',
+      title: 'intermediate_abs',
+      duration: 'intermediate_abs_duration',
       difficulty: 2,
       image: 'https://storage.googleapis.com/a1aa/image/2d0d895c-60c1-4031-b4bc-5f1977902f03.jpg',
     },
     {
       id: '3',
-      title: 'Bụng Nâng cao',
-      duration: '36 phút · 21 Bài tập',
+      title: 'advanced_abs',
+      duration: 'advanced_abs_duration',
       difficulty: 3,
       image: 'https://storage.googleapis.com/a1aa/image/b12d936d-e86d-41be-12a3-7cb241610130.jpg',
     },
@@ -67,61 +69,73 @@ const DATA = {
   exerciseData: [
     {
       id: '1',
-      title: 'Nâng cao & làm tròn mông',
-      subtitle: '7 phút · Người bắt đầu',
+      title: 'advanced_butt_rounding',
+      subtitle: 'advanced_butt_rounding_subtitle',
       image: 'https://storage.googleapis.com/a1aa/image/b73e0ce0-9469-4359-f7be-45c5995620f6.jpg',
     },
     {
       id: '2',
-      title: 'Tạo hình và làm săn chắc mông',
-      subtitle: '10 phút · Người bắt đầu',
+      title: 'butt_shaping_toning',
+      subtitle: 'butt_shaping_toning_subtitle',
       image: 'https://storage.googleapis.com/a1aa/image/a5e0a963-0365-492a-0911-b88ff32dbebf.jpg',
     },
     {
       id: '3',
-      title: 'Tập luyện ngực to hơn nhanh chóng',
-      subtitle: '11 phút · Trung bình',
+      title: 'quick_bigger_chest',
+      subtitle: 'quick_bigger_chest_subtitle',
       image: 'https://storage.googleapis.com/a1aa/image/15fb23e5-fdae-41f9-1aff-9890c0cdc825.jpg',
     },
   ],
   stretchData: [
     {
       id: '1',
-      title: '4 phút với Tabata',
+      title: '4_min_tabata',
       image: 'https://storage.googleapis.com/a1aa/image/2bf59382-4d1b-4971-6590-fc7de483a532.jpg',
     },
     {
       id: '2',
-      title: 'Kéo giãn thời gian ngủ',
+      title: 'sleep_time_stretch',
       image: 'https://storage.googleapis.com/a1aa/image/200a769a-f6a7-4dd3-e614-48d07edf3da9.jpg',
     },
   ],
   recommendData: [
     {
       id: '1',
-      title: 'Tập cơ trung tâm cho người mới bắt đầu',
-      subtitle: '9 phút · Người bắt đầu',
+      title: 'beginner_core_workout',
+      subtitle: 'beginner_core_workout_subtitle',
       image: 'https://storage.googleapis.com/a1aa/image/fa52c163-3ecf-4373-a2a4-96c0c95e8583.jpg',
     },
     {
       id: '2',
-      title: 'Tập mông kết hình',
-      subtitle: '8 phút · Trung bình',
+      title: 'butt_shaping_workout',
+      subtitle: 'butt_shaping_workout_subtitle',
       image: 'https://storage.googleapis.com/a1aa/image/09288296-aedf-4230-52ca-6aeb135f6ad3.jpg',
     },
   ],
 };
 
-const WorkoutScreen = () => {
-  const [activeTab, setActiveTab] = useState('Bụng');
+const WorkoutScreen = ({ navigation }) => {
+  const { colors } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
+  const [activeTab, setActiveTab] = useState('abs');
   const [searchText, setSearchText] = useState('');
+  const [language, setLanguage] = useState(i18n.language);
+
+  useEffect(() => {
+    const onLanguageChange = () => {
+      console.log('Language changed in WorkoutScreen:', i18n.language);
+      setLanguage(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChange);
+    return () => i18n.off('languageChanged', onLanguageChange);
+  }, [i18n]);
 
   const renderDifficultyStars = (difficulty) => (
-    <View style={styles.difficultyContainer}>
+    <View style={styles(colors).difficultyContainer}>
       {[1, 2, 3].map((star) => (
         <Text
           key={star}
-          style={[styles.difficultyStar, { color: star <= difficulty ? '#2563eb' : '#d1d5db' }]}
+          style={[styles(colors).difficultyStar, { color: star <= difficulty ? colors.primary : colors.muted }]}
         >
           ⚡
         </Text>
@@ -130,25 +144,25 @@ const WorkoutScreen = () => {
   );
 
   const Header = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>TẬP LUYỆN TẠI NHÀ</Text>
-      <View style={styles.headerIcons}>
-        <Text style={styles.heartIcon}>❤️</Text>
-        <TouchableOpacity style={styles.proButton}>
-          <Text style={styles.proIcon}>👑</Text>
-          <Text style={styles.proText}>PRO↑</Text>
+    <View style={styles(colors).header}>
+      <Text style={styles(colors).headerTitle}>{t('home_workout')}</Text>
+      <View style={styles(colors).headerIcons}>
+        <Text style={styles(colors).heartIcon}>❤️</Text>
+        <TouchableOpacity style={styles(colors).proButton}>
+          <Text style={styles(colors).proIcon}>👑</Text>
+          <Text style={styles(colors).proText}>{t('pro')}</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
   const SearchBar = () => (
-    <View style={styles.searchContainer}>
-      <Text style={styles.searchIcon}>🔍</Text>
+    <View style={styles(colors).searchContainer}>
+      <Text style={styles(colors).searchIcon}>🔍</Text>
       <TextInput
-        style={styles.searchInput}
-        placeholder="Tìm kiếm bài tập, kế hoạch..."
-        placeholderTextColor="#999999"
+        style={styles(colors).searchInput}
+        placeholder={t('search_placeholder')}
+        placeholderTextColor={colors.muted}
         value={searchText}
         onChangeText={setSearchText}
       />
@@ -162,11 +176,9 @@ const WorkoutScreen = () => {
     const currentMonth = today.getMonth();
     const currentYear = today.getFullYear();
 
-    // Calculate the start of the week (Monday)
     const startOfWeek = new Date(today);
     startOfWeek.setDate(today.getDate() - (currentWeekday === 0 ? 6 : currentWeekday - 1));
 
-    // Generate array of 7 days with date objects for better handling
     const daysOfWeek = Array.from({ length: 7 }, (_, index) => {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + index);
@@ -178,46 +190,38 @@ const WorkoutScreen = () => {
       };
     });
 
-    // Find index of current day
     const currentDayIndex = currentWeekday === 0 ? 6 : currentWeekday - 1;
 
-    // Debugging logs
-    console.log('Current Date:', today.toISOString());
-    console.log('Start of Week:', startOfWeek.toISOString());
-    console.log('Days of Week:', daysOfWeek.map(d => `${d.date}/${d.month + 1}/${d.year}`));
-    console.log('Current Day Index:', currentDayIndex);
-
-    // Format week range for display (e.g., "7/7 - 13/7")
     const endOfWeek = new Date(startOfWeek);
     endOfWeek.setDate(startOfWeek.getDate() + 6);
     const weekRange = `${startOfWeek.getDate()}/${startOfWeek.getMonth() + 1} - ${endOfWeek.getDate()}/${endOfWeek.getMonth() + 1}`;
 
     return (
-      <View style={styles.weeklyGoal}>
-        <View style={styles.weeklyGoalHeader}>
-          <Text style={styles.weeklyGoalTitle}>Mục tiêu hàng tuần ({weekRange})</Text>
-          <View style={styles.scoreContainer}>
-            <Text style={styles.scoreBlue}>0</Text>
-            <Text style={styles.scoreGray}>/7</Text>
-            <Text style={styles.editIcon}>✏️</Text>
+      <View style={styles(colors).weeklyGoal}>
+        <View style={styles(colors).weeklyGoalHeader}>
+          <Text style={styles(colors).weeklyGoalTitle}>{t('weekly_goal', { range: weekRange })}</Text>
+          <View style={styles(colors).scoreContainer}>
+            <Text style={styles(colors).scoreBlue}>0</Text>
+            <Text style={styles(colors).scoreGray}>/7</Text>
+            <Text style={styles(colors).editIcon}>✏️</Text>
           </View>
         </View>
-        <View style={styles.daysRow}>
+        <View style={styles(colors).daysRow}>
           {daysOfWeek.map((dayObj, index) => (
             <TouchableOpacity
               key={`${dayObj.date}-${dayObj.month}-${dayObj.year}-${index}`}
               style={[
-                styles.dayButton,
-                dayObj.isCurrentDay && styles.activeDayButton,
-                index > currentDayIndex && styles.disabledDayButton,
+                styles(colors).dayButton,
+                dayObj.isCurrentDay && styles(colors).activeDayButton,
+                index > currentDayIndex && styles(colors).disabledDayButton,
               ]}
               disabled={index > currentDayIndex}
             >
               <Text
                 style={[
-                  styles.dayText,
-                  dayObj.isCurrentDay && styles.activeDayText,
-                  index > currentDayIndex && styles.disabledDayText,
+                  styles(colors).dayText,
+                  dayObj.isCurrentDay && styles(colors).activeDayText,
+                  index > currentDayIndex && styles(colors).disabledDayText,
                 ]}
               >
                 {dayObj.date}
@@ -225,105 +229,113 @@ const WorkoutScreen = () => {
             </TouchableOpacity>
           ))}
         </View>
-        <View style={styles.weeklyMessage}>
-          <Text style={styles.motivationText}>
-            Thời gian tốt nhất để xây dựng bản thân mới luôn là NGAY BÂY GIỜ!
-          </Text>
+        <View style={styles(colors).weeklyMessage}>
+          <Text style={styles(colors).motivationText}>{t('motivation_text')}</Text>
         </View>
       </View>
     );
   };
 
   const ChallengeCard = ({ item }) => (
-    <View style={[styles.challengeCard, { backgroundColor: item.gradient[0] }]}>
-      <Text style={styles.challengeTitle}>{item.title}</Text>
-      <Text style={styles.challengeDescription}>{item.description}</Text>
-      <TouchableOpacity style={styles.challengeButton}>
-        <Text style={[styles.challengeButtonText, { color: item.gradient[0] }]}>
-          KHỞI ĐẦU
+    <View style={[styles(colors).challengeCard, { backgroundColor: item.gradient[0] }]}>
+      <Text style={styles(colors).challengeTitle}>{t(item.title)}</Text>
+      <Text style={styles(colors).challengeDescription}>{t(item.description)}</Text>
+      <TouchableOpacity
+        style={styles(colors).challengeButton}
+        onPress={() => {
+          console.log('Navigating to:', item.title.includes('full_body_challenge') ? 'Exe1' : 'Exe2');
+          if (item.title.includes('full_body_challenge')) {
+            navigation.navigate('Exe1');
+          } else if (item.title.includes('upper_body_challenge')) {
+            navigation.navigate('Exe2');
+          }
+        }}
+      >
+        <Text style={[styles(colors).challengeButtonText, { color: item.gradient[0] }]}>
+          {t('start')}
         </Text>
       </TouchableOpacity>
     </View>
   );
 
   const WorkoutItem = ({ item }) => (
-    <View style={styles.workoutItem}>
-      <Image source={{ uri: item.image }} style={styles.workoutImage} />
-      <View style={styles.workoutInfo}>
-        <Text style={styles.workoutTitle}>{item.title}</Text>
-        <Text style={styles.workoutDuration}>{item.duration}</Text>
+    <View style={styles(colors).workoutItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).workoutImage} />
+      <View style={styles(colors).workoutInfo}>
+        <Text style={styles(colors).workoutTitle}>{t(item.title)}</Text>
+        <Text style={styles(colors).workoutDuration}>{t(item.duration)}</Text>
         {renderDifficultyStars(item.difficulty)}
       </View>
     </View>
   );
 
   const ExerciseItem = ({ item }) => (
-    <View style={styles.exerciseItem}>
-      <Image source={{ uri: item.image }} style={styles.exerciseImage} />
-      <View style={styles.exerciseInfo}>
-        <Text style={styles.exerciseTitle}>{item.title}</Text>
-        <Text style={styles.exerciseSubtitle}>{item.subtitle}</Text>
+    <View style={styles(colors).exerciseItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).exerciseImage} />
+      <View style={styles(colors).exerciseInfo}>
+        <Text style={styles(colors).exerciseTitle}>{t(item.title)}</Text>
+        <Text style={styles(colors).exerciseSubtitle}>{t(item.subtitle)}</Text>
       </View>
-      <Text style={styles.exerciseArrow}>→</Text>
+      <Text style={styles(colors).exerciseArrow}>→</Text>
     </View>
   );
 
   const StretchCard = ({ item }) => (
-    <View style={styles.stretchCard}>
-      <Image source={{ uri: item.image }} style={styles.stretchImage} />
-      <View style={styles.stretchOverlay}>
-        <Text style={styles.stretchText}>{item.title}</Text>
+    <View style={styles(colors).stretchCard}>
+      <Image source={{ uri: item.image }} style={styles(colors).stretchImage} />
+      <View style={styles(colors).stretchOverlay}>
+        <Text style={styles(colors).stretchText}>{t(item.title)}</Text>
       </View>
     </View>
   );
 
   const RecommendItem = ({ item }) => (
-    <View style={styles.recommendItem}>
-      <Image source={{ uri: item.image }} style={styles.recommendImage} />
-      <View style={styles.recommendInfo}>
-        <Text style={styles.recommendTitle}>{item.title}</Text>
-        <Text style={styles.recommendSubtitle}>{item.subtitle}</Text>
+    <View style={styles(colors).recommendItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).recommendImage} />
+      <View style={styles(colors).recommendInfo}>
+        <Text style={styles(colors).recommendTitle}>{t(item.title)}</Text>
+        <Text style={styles(colors).recommendSubtitle}>{t(item.subtitle)}</Text>
       </View>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.fixedHeaderContainer}>
+    <SafeAreaView style={styles(colors).container}>
+      <View style={styles(colors).fixedHeaderContainer}>
         <Header />
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles(colors).scrollContent}
       >
         <SearchBar />
         <WeeklyGoal />
-        <View style={styles.challengeSection}>
-          <Text style={styles.sectionTitle}>THỬ THÁCH 7x4</Text>
+        <View style={styles(colors).challengeSection}>
+          <Text style={styles(colors).sectionTitle}>{t('7x4_challenge')}</Text>
           <FlatList
             data={DATA.challengeData}
             renderItem={ChallengeCard}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.challengeList}
+            contentContainerStyle={styles(colors).challengeList}
           />
         </View>
-        <View style={styles.bodyFocusSection}>
-          <Text style={styles.sectionTitle}>Cơ thể tập trung</Text>
+        <View style={styles(colors).bodyFocusSection}>
+          <Text style={styles(colors).sectionTitle}>{t('body_focus')}</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.tabsContainer}
+            style={styles(colors).tabsContainer}
           >
             {DATA.tabs.map((tab) => (
               <TouchableOpacity
                 key={tab}
-                style={[styles.tab, activeTab === tab && styles.activeTab]}
+                style={[styles(colors).tab, activeTab === tab && styles(colors).activeTab]}
                 onPress={() => setActiveTab(tab)}
               >
-                <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
-                  {tab}
+                <Text style={[styles(colors).tabText, activeTab === tab && styles(colors).activeTabText]}>
+                  {t(tab)}
                 </Text>
               </TouchableOpacity>
             ))}
@@ -334,20 +346,20 @@ const WorkoutScreen = () => {
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
           />
-          <View style={styles.tagsContainer}>
+          <View style={styles(colors).tagsContainer}>
             {DATA.tags.map((tag, index) => (
-              <TouchableOpacity key={index} style={styles.tag}>
-                <Text style={styles.tagIcon}>{tag.icon}</Text>
-                <Text style={styles.tagText}>{tag.text}</Text>
+              <TouchableOpacity key={index} style={styles(colors).tag}>
+                <Text style={styles(colors).tagIcon}>{tag.icon}</Text>
+                <Text style={styles(colors).tagText}>{t(tag.text)}</Text>
               </TouchableOpacity>
             ))}
           </View>
         </View>
-        <View style={styles.recommendSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Chỉ dành cho bạn</Text>
+        <View style={styles(colors).recommendSection}>
+          <View style={styles(colors).sectionHeader}>
+            <Text style={styles(colors).sectionTitle}>{t('just_for_you')}</Text>
             <TouchableOpacity>
-              <Text style={styles.moreLink}>Thêm →</Text>
+              <Text style={styles(colors).moreLink}>{t('more')}</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -357,11 +369,11 @@ const WorkoutScreen = () => {
             scrollEnabled={false}
           />
         </View>
-        <View style={styles.stretchSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Kéo giãn và khởi động</Text>
+        <View style={styles(colors).stretchSection}>
+          <View style={styles(colors).sectionHeader}>
+            <Text style={styles(colors).sectionTitle}>{t('stretch_warmup')}</Text>
             <TouchableOpacity>
-              <Text style={styles.moreLink}>Thêm →</Text>
+              <Text style={styles(colors).moreLink}>{t('more')}</Text>
             </TouchableOpacity>
           </View>
           <FlatList
@@ -370,58 +382,58 @@ const WorkoutScreen = () => {
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.stretchList}
+            contentContainerStyle={styles(colors).stretchList}
           />
         </View>
-        <View style={styles.goalsSection}>
-          <Text style={styles.sectionTitle}>Mục tiêu phổ biến</Text>
+        <View style={styles(colors).goalsSection}>
+          <Text style={styles(colors).sectionTitle}>{t('popular_goals')}</Text>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
-            style={styles.goalsContainer}
+            style={styles(colors).goalsContainer}
           >
             {DATA.goals.map((goal, index) => (
               <TouchableOpacity
                 key={goal}
                 style={[
-                  styles.goalButton,
-                  index === 0 ? styles.activeGoalButton : styles.inactiveGoalButton,
+                  styles(colors).goalButton,
+                  index === 0 ? styles(colors).activeGoalButton : styles(colors).inactiveGoalButton,
                 ]}
                 disabled={index !== 0}
               >
                 <Text
                   style={[
-                    styles.goalButtonText,
-                    index === 0 ? styles.activeGoalText : styles.inactiveGoalText,
+                    styles(colors).goalButtonText,
+                    index === 0 ? styles(colors).activeGoalText : styles(colors).inactiveGoalText,
                   ]}
                 >
-                  {goal}
+                  {t(goal)}
                 </Text>
               </TouchableOpacity>
             ))}
           </ScrollView>
-          <View style={styles.exerciseCard}>
+          <View style={styles(colors).exerciseCard}>
             <FlatList
               data={DATA.exerciseData}
               renderItem={ExerciseItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
             />
-            <TouchableOpacity style={styles.addMore}>
-              <Text style={styles.addMoreText}>Thêm →</Text>
+            <TouchableOpacity style={styles(colors).addMore}>
+              <Text style={styles(colors).addMoreText}>{t('more')}</Text>
             </TouchableOpacity>
           </View>
         </View>
-        <View style={styles.discoverSection}>
-          <View style={styles.discoverCard}>
+        <View style={styles(colors).discoverSection}>
+          <View style={styles(colors).discoverCard}>
             <Image
               source={{ uri: 'https://storage.googleapis.com/a1aa/image/78ea1ca5-c292-4cba-619a-2ee6e1e3ff9d.jpg' }}
-              style={styles.discoverImage}
+              style={styles(colors).discoverImage}
             />
-            <View style={styles.discoverOverlay}>
-              <Text style={styles.discoverText}>Khám phá thêm bài tập</Text>
-              <TouchableOpacity style={styles.discoverButton}>
-                <Text style={styles.discoverButtonText}>Đi</Text>
+            <View style={styles(colors).discoverOverlay}>
+              <Text style={styles(colors).discoverText}>{t('discover_more_exercises')}</Text>
+              <TouchableOpacity style={styles(colors).discoverButton}>
+                <Text style={styles(colors).discoverButtonText}>{t('go')}</Text>
               </TouchableOpacity>
             </View>
           </View>
@@ -431,19 +443,7 @@ const WorkoutScreen = () => {
   );
 };
 
-const colors = {
-  primary: '#2563eb',
-  secondary: '#9ca3af',
-  background: '#f9fafb',
-  card: '#fff',
-  text: '#000',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  accent: '#f9d8a6',
-  accentText: '#6b4b00',
-};
-
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.background },
   fixedHeaderContainer: {
     position: 'absolute',
@@ -485,7 +485,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
   },
-  searchIcon: { fontSize: 20, marginRight: 12 },
+  searchIcon: { fontSize: 20, color: colors.muted },
   searchInput: { flex: 1, fontSize: 16, color: colors.text },
   scrollContent: {
     paddingTop: 60,
@@ -512,10 +512,10 @@ const styles = StyleSheet.create({
   scoreContainer: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   scoreBlue: { color: colors.primary, fontWeight: '700', fontSize: 18 },
   scoreGray: { color: colors.muted, fontSize: 18 },
-  editIcon: { fontSize: 16, marginLeft: 8 },
+  editIcon: { fontSize: 16, color: colors.muted, marginLeft: 8 },
   daysRow: { flexDirection: 'row', gap: 24, marginBottom: 12 },
   dayButton: { width: 32, height: 32, justifyContent: 'center', alignItems: 'center' },
-  activeDayButton: { backgroundColor: '#93c5fd', borderRadius: 16, borderWidth: 2, borderColor: '#93c5fd' },
+  activeDayButton: { backgroundColor: colors.primary + '33', borderRadius: 16, borderWidth: 2, borderColor: colors.primary },
   disabledDayButton: { opacity: 0.5 },
   dayText: { fontSize: 18, fontWeight: '600', color: colors.text },
   activeDayText: { color: colors.primary, fontWeight: '700' },
@@ -579,7 +579,7 @@ const styles = StyleSheet.create({
     width: (width - 64) / 3,
   },
   tagIcon: { fontSize: 18 },
-  tagText: { fontSize: 14, fontWeight: '600', color: '#374151', flex: 1 },
+  tagText: { fontSize: 14, fontWeight: '600', color: colors.text, flex: 1 },
   recommendSection: { paddingHorizontal: 20, marginBottom: 24 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   moreLink: { color: colors.primary, fontSize: 14, fontWeight: '600' },
@@ -605,7 +605,7 @@ const styles = StyleSheet.create({
   goalsContainer: { marginBottom: 12 },
   goalButton: { paddingHorizontal: 16, paddingVertical: 6, borderRadius: 20, marginRight: 12, borderWidth: 1.5 },
   activeGoalButton: { backgroundColor: 'transparent', borderColor: colors.primary },
-  inactiveGoalButton: { backgroundColor: '#f3f4f6', borderColor: 'transparent' },
+  inactiveGoalButton: { backgroundColor: colors.border, borderColor: 'transparent' },
   goalButtonText: { fontSize: 14, fontWeight: '600' },
   activeGoalText: { color: colors.primary },
   inactiveGoalText: { color: colors.secondary },

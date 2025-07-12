@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   View,
   Text,
@@ -12,34 +12,48 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
 const ReportScreen = () => {
+  const { colors } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
   const [currentWeight, setCurrentWeight] = useState('--');
   const [heaviestWeight, setHeaviestWeight] = useState('--');
   const [lightestWeight, setLightestWeight] = useState('--');
   const [bmiValue, setBmiValue] = useState('--');
+  const [language, setLanguage] = useState(i18n.language);
+
+  useEffect(() => {
+    const onLanguageChange = () => {
+      console.log('Language changed in ReportScreen:', i18n.language);
+      setLanguage(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChange);
+    return () => i18n.off('languageChanged', onLanguageChange);
+  }, [i18n]);
 
   const ReportItem = ({ icon, number, label }) => (
-    <View style={styles.reportItem}>
-      <View style={styles.iconContainer}>
+    <View style={styles(colors).reportItem}>
+      <View style={styles(colors).iconContainer}>
         <Ionicons name={icon} size={22} color={colors.text} />
-        <View style={styles.iconBadge} />
+        <View style={styles(colors).iconBadge} />
       </View>
-      <Text style={styles.reportNumber}>{number}</Text>
-      <Text style={styles.reportLabel}>{label}</Text>
+      <Text style={styles(colors).reportNumber}>{number}</Text>
+      <Text style={styles(colors).reportLabel}>{t(label)}</Text>
     </View>
   );
 
   const CalendarDay = ({ day, isActive, isInactive }) => (
-    <View style={styles.dateContainer}>
+    <View style={styles(colors).dateContainer}>
       {isActive ? (
-        <View style={styles.activeDate}>
-          <Text style={styles.activeDateText}>{day}</Text>
+        <View style={styles(colors).activeDate}>
+          <Text style={styles(colors).activeDateText}>{day}</Text>
         </View>
       ) : (
-        <Text style={[styles.dateText, isInactive && styles.inactiveDate]}>
+        <Text style={[styles(colors).dateText, isInactive && styles(colors).inactiveDate]}>
           {day}
         </Text>
       )}
@@ -47,74 +61,64 @@ const ReportScreen = () => {
   );
 
   const BMIColorBar = () => (
-    <View style={styles.colorBar}>
-      <View style={[styles.colorSegment, styles.blueDark]} />
-      <View style={[styles.colorSegment, styles.blueLight]} />
-      <View style={[styles.colorSegment, styles.cyan]} />
-      <View style={[styles.colorSegment, styles.yellow]} />
-      <View style={[styles.colorSegment, styles.orange]} />
-      <View style={[styles.colorSegment, styles.red]} />
+    <View style={styles(colors).colorBar}>
+      <View style={[styles(colors).colorSegment, styles(colors).blueDark]} />
+      <View style={[styles(colors).colorSegment, styles(colors).blueLight]} />
+      <View style={[styles(colors).colorSegment, styles(colors).cyan]} />
+      <View style={[styles(colors).colorSegment, styles(colors).yellow]} />
+      <View style={[styles(colors).colorSegment, styles(colors).orange]} />
+      <View style={[styles(colors).colorSegment, styles(colors).red]} />
     </View>
   );
 
   const WeightChart = () => (
-    <View style={styles.chartContainer}>
-      <View style={styles.chartLabels}>
+    <View style={styles(colors).chartContainer}>
+      <View style={styles(colors).chartLabels}>
         {['700', '600', '500', '400', '300', '200', '100'].map((label, index) => (
-          <Text key={index} style={styles.chartLabel}>{label}</Text>
+          <Text key={index} style={styles(colors).chartLabel}>{label}</Text>
         ))}
       </View>
-      <View style={styles.chartDates}>
+      <View style={styles(colors).chartDates}>
         {['23', '24', '25', '26', '27', '28', '29'].map((date, index) => (
-          <Text key={index} style={styles.chartDate}>{date}</Text>
+          <Text key={index} style={styles(colors).chartDate}>{date}</Text>
         ))}
       </View>
     </View>
   );
 
   const Header = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>REPORT</Text>
+    <View style={styles(colors).header}>
+      <Text style={styles(colors).headerTitle}>{t('report')}</Text>
     </View>
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
-      <View style={styles.fixedHeaderContainer}>
+    <SafeAreaView style={styles(colors).container}>
+      <View style={styles(colors).fixedHeaderContainer}>
         <Header />
       </View>
-
-      {/* Scrollable Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles(colors).scrollContent}
       >
-        {/* Summary Section */}
-        <View style={styles.reportBox}>
-          <ReportItem icon="medal" number="0" label="Workout" />
-          <ReportItem icon="water" number="0" label="Kcal" />
-          <ReportItem icon="time" number="0" label="Minute" />
+        <View style={styles(colors).reportBox}>
+          <ReportItem icon="medal" number="0" label="workout" />
+          <ReportItem icon="water" number="0" label="kcal" />
+          <ReportItem icon="time" number="0" label="minute" />
         </View>
-
-        {/* History Section */}
-        <View style={styles.historyHeader}>
-          <Text style={styles.sectionTitle}>History</Text>
-          <TouchableOpacity>
-            <Text style={styles.allRecordsLink}>All records</Text>
+        <View style={styles(colors).historyHeader}>
+          <Text style={styles(colors).sectionTitle}>{t('history')}</Text>
+          <TouchableOpacity onPress={() => console.log('All records pressed')}>
+            <Text style={styles(colors).allRecordsLink}>{t('all_records')}</Text>
           </TouchableOpacity>
         </View>
-
-        <View style={styles.historyBox}>
-          {/* Weekdays */}
-          <View style={styles.weekdays}>
+        <View style={styles(colors).historyBox}>
+          <View style={styles(colors).weekdays}>
             {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((day, index) => (
-              <Text key={index} style={styles.weekdayText}>{day}</Text>
+              <Text key={index} style={styles(colors).weekdayText}>{day}</Text>
             ))}
           </View>
-
-          {/* Dates */}
-          <View style={styles.dates}>
+          <View style={styles(colors).dates}>
             <CalendarDay day="22" />
             <CalendarDay day="23" />
             <CalendarDay day="24" />
@@ -123,122 +127,117 @@ const ReportScreen = () => {
             <CalendarDay day="27" isInactive />
             <CalendarDay day="28" isInactive />
           </View>
-
-          {/* Day Streak */}
-          <View style={styles.dayStreak}>
-            <Text style={styles.dayStreakText}>Day Streak</Text>
+          <View style={styles(colors).dayStreak}>
+            <Text style={styles(colors).dayStreakText}>{t('day_streak')}</Text>
             <Ionicons name="flame" size={18} color="#ef4444" />
-            <Text style={styles.dayStreakNumber}>0</Text>
+            <Text style={styles(colors).dayStreakNumber}>0</Text>
           </View>
         </View>
-
-        {/* Weight Section */}
-        <View style={styles.section}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Weight</Text>
-            <TouchableOpacity style={styles.logButton}>
-              <Text style={styles.logButtonText}>Log</Text>
+        <View style={styles(colors).section}>
+          <View style={styles(colors).sectionHeader}>
+            <Text style={styles(colors).sectionTitle}>{t('weight')}</Text>
+            <TouchableOpacity
+              style={styles(colors).logButton}
+              onPress={() => console.log('Log weight pressed')}
+            >
+              <Text style={styles(colors).logButtonText}>{t('log')}</Text>
             </TouchableOpacity>
           </View>
-
-          <View style={styles.historyBox}>
-            <View style={styles.stats}>
-              <View style={styles.statsLeft}>
-                <Text style={styles.statsLabel}>Current</Text>
-                <Text style={styles.statsValue}>{currentWeight}</Text>
+          <View style={styles(colors).historyBox}>
+            <View style={styles(colors).stats}>
+              <View style={styles(colors).statsLeft}>
+                <Text style={styles(colors).statsLabel}>{t('current')}</Text>
+                <Text style={styles(colors).statsValue}>{currentWeight}</Text>
               </View>
-              <View style={styles.statsRight}>
-                <Text style={styles.statsLabel}>Heaviest</Text>
-                <Text style={styles.statsValue}>{heaviestWeight}</Text>
-                <Text style={styles.statsLabel}>Lightest</Text>
-                <Text style={styles.statsValue}>{lightestWeight}</Text>
+              <View style={styles(colors).statsRight}>
+                <Text style={styles(colors).statsLabel}>{t('heaviest')}</Text>
+                <Text style={styles(colors).statsValue}>{heaviestWeight}</Text>
+                <Text style={styles(colors).statsLabel}>{t('lightest')}</Text>
+                <Text style={styles(colors).statsValue}>{lightestWeight}</Text>
               </View>
             </View>
             <WeightChart />
           </View>
         </View>
-
-        {/* Progress Bar */}
-        <View style={styles.progressBarBg} />
-
-        {/* BMI Section */}
-        <View style={styles.bmiContainer}>
-          <View style={styles.bmiHeader}>
-            <Text style={styles.sectionTitle}>BMI</Text>
-            <TouchableOpacity style={styles.editButton}>
-              <Text style={styles.editButtonText}>Edit</Text>
+        <View style={styles(colors).progressBarBg} />
+        <View style={styles(colors).bmiContainer}>
+          <View style={styles(colors).bmiHeader}>
+            <Text style={styles(colors).sectionTitle}>{t('bmi')}</Text>
+            <TouchableOpacity
+              style={styles(colors).editButton}
+              onPress={() => console.log('Edit BMI pressed')}
+            >
+              <Text style={styles(colors).editButtonText}>{t('edit')}</Text>
             </TouchableOpacity>
           </View>
-          <Text style={styles.bmiValue}>{bmiValue}</Text>
+          <Text style={styles(colors).bmiValue}>{bmiValue}</Text>
           <BMIColorBar />
-          <View style={styles.scaleLabels}>
+          <View style={styles(colors).scaleLabels}>
             {['15', '16', '18.5', '25', '30', '35', '40'].map((label, index) => (
-              <Text key={index} style={styles.scaleLabel}>{label}</Text>
+              <Text key={index} style={styles(colors).scaleLabel}>{label}</Text>
             ))}
           </View>
-          <View style={styles.heightRow}>
-            <Text style={styles.heightText}>Height</Text>
-            <TouchableOpacity style={styles.heightEdit}>
-              <Text style={styles.heightEditText}>Edit</Text>
+          <View style={styles(colors).heightRow}>
+            <Text style={styles(colors).heightText}>{t('height')}</Text>
+            <TouchableOpacity
+              style={styles(colors).heightEdit}
+              onPress={() => console.log('Edit height pressed')}
+            >
+              <Text style={styles(colors).heightEditText}>{t('edit')}</Text>
               <Ionicons name="pencil" size={10} color={colors.muted} />
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Image Advertisement Section */}
-        <View style={styles.imageSection}>
+        <View style={styles(colors).imageSection}>
           <ImageBackground
             source={{
               uri: 'https://storage.googleapis.com/a1aa/image/ad6c185a-4ca3-43b4-fb77-bc2e4821e76d.jpg',
             }}
-            style={styles.backgroundImage}
-            imageStyle={styles.backgroundImageStyle}
+            style={styles(colors).backgroundImage}
+            imageStyle={styles(colors).backgroundImageStyle}
           >
             <Image
               source={{
                 uri: 'https://storage.googleapis.com/a1aa/image/1aa2a23d-4b6a-4413-df09-a1b2093f51f9.jpg',
               }}
-              style={styles.circleImage}
+              style={styles(colors).circleImage}
             />
-            <View style={styles.weeksLabel}>
-              <Text style={styles.weeksText}>4 WEEKS</Text>
+            <View style={styles(colors).weeksLabel}>
+              <Text style={styles(colors).weeksText}>{t('four_weeks')}</Text>
             </View>
             <LinearGradient
               colors={['transparent', 'rgba(0,0,0,0.8)']}
-              style={styles.imageGradient}
+              style={styles(colors).imageGradient}
             />
-            <Text style={styles.jawlineText}>GET A CHISELED JAWLINE</Text>
+            <Text style={styles(colors).jawlineText}>{t('get_chiseled_jawline')}</Text>
           </ImageBackground>
         </View>
-
-        {/* Ad Details Section */}
-        <View style={styles.adSection}>
-          <View style={styles.adHeader}>
-            <View style={styles.adLabel}>
-              <Text style={styles.adLabelText}>AD</Text>
+        <View style={styles(colors).adSection}>
+          <View style={styles(colors).adHeader}>
+            <View style={styles(colors).adLabel}>
+              <Text style={styles(colors).adLabelText}>{t('ad')}</Text>
             </View>
             <Image
               source={{
                 uri: 'https://storage.googleapis.com/a1aa/image/0714f18b-0fd1-464a-d9d4-088d1f7d5739.jpg',
               }}
-              style={styles.adIcon}
+              style={styles(colors).adIcon}
             />
-            <Text style={styles.adTitle}>Jawline Exercises - Face Yoga</Text>
+            <Text style={styles(colors).adTitle}>{t('jawline_exercises')}</Text>
           </View>
-          <Text style={styles.adDesc}>
-            Face exercise & face yoga for jawline. Reduce double chin & lose face fat.
-          </Text>
+          <Text style={styles(colors).adDesc}>{t('jawline_exercises_desc')}</Text>
         </View>
-
-        {/* Install Button */}
         <LinearGradient
           colors={['#f43f5e', '#ec4899']}
-          style={styles.installButton}
+          style={styles(colors).installButton}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
         >
-          <TouchableOpacity style={styles.installButtonTouchable}>
-            <Text style={styles.installButtonText}>INSTALL</Text>
+          <TouchableOpacity
+            style={styles(colors).installButtonTouchable}
+            onPress={() => console.log('Install pressed')}
+          >
+            <Text style={styles(colors).installButtonText}>{t('install')}</Text>
           </TouchableOpacity>
         </LinearGradient>
       </ScrollView>
@@ -246,19 +245,7 @@ const ReportScreen = () => {
   );
 };
 
-const colors = {
-  primary: '#2563eb',
-  secondary: '#9ca3af',
-  background: '#f9fafb',
-  card: '#fff',
-  text: '#000',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  accent: '#f9d8a6',
-  accentText: '#6b4b00',
-};
-
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -285,7 +272,7 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
   scrollContent: {
-    paddingTop: 60, // Adjust based on header height
+    paddingTop: 60,
     paddingHorizontal: 20,
     paddingBottom: 40,
   },

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {
   ScrollView,
   View,
@@ -11,6 +11,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome5';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
 
@@ -18,156 +20,169 @@ const DATA = {
   picksData: [
     {
       id: '1',
-      title: 'Belly Fat Burner HIIT Beginner',
-      duration: '14 min · Beginner',
+      title: 'belly_fat_burner_hiit_beginner',
+      duration: 'belly_fat_burner_hiit_beginner_duration',
       image: 'https://storage.googleapis.com/a1aa/image/7ba0c774-e28e-4acf-297f-0c0c539f6d09.jpg',
     },
     {
       id: '2',
-      title: 'Lose Fat (No Jumping!)',
-      duration: '15 min · Intermediate',
+      title: 'lose_fat_no_jumping',
+      duration: 'lose_fat_no_jumping_duration',
       image: 'https://storage.googleapis.com/a1aa/image/9ec03bae-8d04-489c-9303-b54f9e6e2045.jpg',
     },
   ],
   beginnerWorkouts: [
     {
       id: '1',
-      title: 'Only 4 Moves for Abs',
+      title: 'four_moves_for_abs',
       image: 'https://storage.googleapis.com/a1aa/image/d2d4d96e-ccf1-4a5d-b43e-10726b6ba09c.jpg',
     },
     {
       id: '2',
-      title: 'Leg Workout (No Jumping!)',
+      title: 'leg_workout_no_jumping',
       image: 'https://storage.googleapis.com/a1aa/image/55bd41b5-b307-4990-ec3d-cf0a8e0ff228.jpg',
     },
     {
       id: '3',
-      title: 'Arm Workout Push-Ups',
+      title: 'arm_workout_push_ups',
       image: 'https://storage.googleapis.com/a1aa/image/a06de38f-04e8-47ef-afc2-264c8b37f5e0.jpg',
     },
   ],
   fastWorkouts: [
     {
       id: '1',
-      title: '4 Min Tabata',
-      duration: '4 min · Intermediate',
+      title: 'four_min_tabata',
+      duration: 'four_min_tabata_duration',
       image: 'https://storage.googleapis.com/a1aa/image/24390373-5464-4546-bf0a-e6d6838ca9f2.jpg',
     },
     {
       id: '2',
-      title: '3 Exercises Lose Belly Fat',
-      duration: '6 min · Beginner',
+      title: 'three_exercises_lose_belly_fat',
+      duration: 'three_exercises_lose_belly_fat_duration',
       image: 'https://storage.googleapis.com/a1aa/image/1a4fd399-2587-4d5a-dbb2-613a96c2a467.jpg',
     },
   ],
   challenges: [
     {
       id: '1',
-      title: 'Plank Challenge',
+      title: 'plank_challenge',
       image: 'https://storage.googleapis.com/a1aa/image/8f80c84d-ecea-4c18-dfb6-89597311b55e.jpg',
     },
     {
       id: '2',
-      title: 'Killer Chest Workout',
+      title: 'killer_chest_workout',
       image: 'https://storage.googleapis.com/a1aa/image/f8c8a504-9cda-4c8d-188b-52faae75e185.jpg',
     },
     {
       id: '3',
-      title: 'Killer Chest Advanced',
+      title: 'killer_chest_advanced',
       image: 'https://storage.googleapis.com/a1aa/image/1a19f58f-0cc0-4832-e25b-e9a4910c9ec0.jpg',
     },
   ],
   bodyFocusData: [
     {
       id: '1',
-      title: 'Full Body Stretching',
+      title: 'full_body_stretching',
       image: 'https://storage.googleapis.com/a1aa/image/77a2775a-99e2-4133-f4eb-da1b564f1570.jpg',
     },
     {
       id: '2',
-      title: 'Morning Warm-Up',
+      title: 'morning_warm_up',
       image: 'https://storage.googleapis.com/a1aa/image/3aa91d73-b94a-412b-48cf-f36c29608ebd.jpg',
     },
     {
       id: '3',
-      title: 'Shoulder Tension Relief',
+      title: 'shoulder_tension_relief',
       image: 'https://storage.googleapis.com/a1aa/image/9b273ecb-24a4-4e71-f9fd-037c37a9d33d.jpg',
     },
     {
       id: '4',
-      title: 'Sleepy Time Stretching',
+      title: 'sleepy_time_stretching',
       image: 'https://storage.googleapis.com/a1aa/image/7cd2ee6f-b087-4466-c9ba-727b04c683af.jpg',
     },
   ],
   bodyFocusButtons: [
-    { id: '1', title: 'Chest', icon: 'dumbbell' },
-    { id: '2', title: 'Arm & Shoulder', icon: 'fist-raised' },
-    { id: '3', title: 'Butt & Leg', icon: 'running' },
-    { id: '4', title: 'Six pack', icon: 'fire' },
+    { id: '1', title: 'chest', icon: 'dumbbell' },
+    { id: '2', title: 'arm_shoulder', icon: 'fist-raised' },
+    { id: '3', title: 'butt_leg', icon: 'running' },
+    { id: '4', title: 'six_pack', icon: 'fire' },
   ],
 };
 
 const DiscoverScreen = () => {
+  const { colors } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
+  const [language, setLanguage] = useState(i18n.language);
+
+  useEffect(() => {
+    const onLanguageChange = () => {
+      console.log('Language changed in DiscoverScreen:', i18n.language);
+      setLanguage(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChange);
+    return () => i18n.off('languageChanged', onLanguageChange);
+  }, [i18n]);
+
   const renderPickItem = ({ item }) => (
-    <TouchableOpacity style={styles.pickItem}>
-      <Image source={{ uri: item.image }} style={styles.pickImage} />
-      <View style={styles.pickInfo}>
-        <Text style={styles.pickTitle}>{item.title}</Text>
-        <Text style={styles.pickDuration}>{item.duration}</Text>
+    <TouchableOpacity style={styles(colors).pickItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).pickImage} />
+      <View style={styles(colors).pickInfo}>
+        <Text style={styles(colors).pickTitle}>{t(item.title)}</Text>
+        <Text style={styles(colors).pickDuration}>{t(item.duration)}</Text>
       </View>
     </TouchableOpacity>
   );
 
   const renderBeginnerCard = ({ item }) => (
-    <TouchableOpacity style={styles.card}>
-      <Image source={{ uri: item.image }} style={styles.cardImage} />
-      <View style={styles.cardOverlay}>
-        <Text style={styles.cardText}>{item.title}</Text>
+    <TouchableOpacity style={styles(colors).card}>
+      <Image source={{ uri: item.image }} style={styles(colors).cardImage} />
+      <View style={styles(colors).cardOverlay}>
+        <Text style={styles(colors).cardText}>{t(item.title)}</Text>
       </View>
     </TouchableOpacity>
   );
 
   const renderFastWorkout = ({ item }) => (
-    <TouchableOpacity style={styles.fastWorkoutItem}>
-      <Image source={{ uri: item.image }} style={styles.fastWorkoutImage} />
-      <View style={styles.fastWorkoutInfo}>
-        <Text style={styles.fastWorkoutTitle}>{item.title}</Text>
-        <Text style={styles.fastWorkoutDuration}>{item.duration}</Text>
+    <TouchableOpacity style={styles(colors).fastWorkoutItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).fastWorkoutImage} />
+      <View style={styles(colors).fastWorkoutInfo}>
+        <Text style={styles(colors).fastWorkoutTitle}>{t(item.title)}</Text>
+        <Text style={styles(colors).fastWorkoutDuration}>{t(item.duration)}</Text>
       </View>
     </TouchableOpacity>
   );
 
   const renderChallenge = ({ item }) => (
-    <TouchableOpacity style={styles.challengeItem}>
-      <Image source={{ uri: item.image }} style={styles.challengeImage} />
-      <View style={styles.challengeOverlay}>
-        <Text style={styles.challengeText}>{item.title}</Text>
+    <TouchableOpacity style={styles(colors).challengeItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).challengeImage} />
+      <View style={styles(colors).challengeOverlay}>
+        <Text style={styles(colors).challengeText}>{t(item.title)}</Text>
       </View>
     </TouchableOpacity>
   );
 
   const renderBodyFocusItem = ({ item }) => (
-    <TouchableOpacity style={styles.bodyFocusItem}>
-      <Image source={{ uri: item.image }} style={styles.bodyFocusImage} />
-      <Text style={styles.bodyFocusTitle}>{item.title}</Text>
+    <TouchableOpacity style={styles(colors).bodyFocusItem}>
+      <Image source={{ uri: item.image }} style={styles(colors).bodyFocusImage} />
+      <Text style={styles(colors).bodyFocusTitle}>{t(item.title)}</Text>
     </TouchableOpacity>
   );
 
   const renderBodyFocusButton = ({ item }) => (
-    <TouchableOpacity style={styles.focusButton}>
-      <Text style={styles.focusButtonText}>{item.title}</Text>
+    <TouchableOpacity style={styles(colors).focusButton}>
+      <Text style={styles(colors).focusButtonText}>{t(item.title)}</Text>
       <Icon name={item.icon} size={24} color={colors.card} />
     </TouchableOpacity>
   );
 
   const Header = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>DISCOVER</Text>
-      <View style={styles.headerIcons}>
-        <TouchableOpacity style={styles.iconButton}>
+    <View style={styles(colors).header}>
+      <Text style={styles(colors).headerTitle}>{t('discover')}</Text>
+      <View style={styles(colors).headerIcons}>
+        <TouchableOpacity style={styles(colors).iconButton}>
           <Icon name="search" size={20} color={colors.text} />
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles(colors).iconButton}>
           <Icon name="clock" size={20} color={colors.text} />
         </TouchableOpacity>
       </View>
@@ -175,36 +190,28 @@ const DiscoverScreen = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
-      <View style={styles.fixedHeaderContainer}>
+    <SafeAreaView style={styles(colors).container}>
+      <View style={styles(colors).fixedHeaderContainer}>
         <Header />
       </View>
-
-      {/* Scrollable Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
+        contentContainerStyle={styles(colors).scrollContent}
       >
-        {/* Main Banner */}
-        <View style={styles.mainBanner}>
+        <View style={styles(colors).mainBanner}>
           <Image
             source={{
               uri: 'https://storage.googleapis.com/a1aa/image/3e61b7b5-898b-4e90-ce14-73c282925be2.jpg',
             }}
-            style={styles.bannerImage}
+            style={styles(colors).bannerImage}
           />
-          <View style={styles.bannerOverlay}>
-            <Text style={styles.bannerTitle}>Only 4 Moves for Abs</Text>
-            <Text style={styles.bannerSubtitle}>
-              4 simple exercises only! Burn belly fat and firm your abs. Get a flat belly fast!
-            </Text>
+          <View style={styles(colors).bannerOverlay}>
+            <Text style={styles(colors).bannerTitle}>{t('four_moves_for_abs')}</Text>
+            <Text style={styles(colors).bannerSubtitle}>{t('four_moves_for_abs_subtitle')}</Text>
           </View>
         </View>
-
-        {/* Picks for you */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Picks for you</Text>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('picks_for_you')}</Text>
           <FlatList
             data={DATA.picksData}
             renderItem={renderPickItem}
@@ -212,37 +219,31 @@ const DiscoverScreen = () => {
             scrollEnabled={false}
           />
         </View>
-
-        {/* Stay Active Banner */}
-        <View style={styles.stayActiveBanner}>
+        <View style={styles(colors).stayActiveBanner}>
           <Image
             source={{
               uri: 'https://storage.googleapis.com/a1aa/image/f499f09d-92a2-4625-7255-26f77f03794d.jpg',
             }}
-            style={styles.stayActiveBannerImage}
+            style={styles(colors).stayActiveBannerImage}
           />
-          <View style={styles.stayActiveBannerOverlay}>
-            <Text style={styles.stayActiveBannerTitle}>Stay active,{'\n'}stay in shape</Text>
-            <Text style={styles.stayActiveBannerSubtitle}>5 workouts</Text>
+          <View style={styles(colors).stayActiveBannerOverlay}>
+            <Text style={styles(colors).stayActiveBannerTitle}>{t('stay_active')}</Text>
+            <Text style={styles(colors).stayActiveBannerSubtitle}>{t('five_workouts')}</Text>
           </View>
         </View>
-
-        {/* For beginners */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>For beginners</Text>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('for_beginners')}</Text>
           <FlatList
             data={DATA.beginnerWorkouts}
             renderItem={renderBeginnerCard}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
+            contentContainerStyle={styles(colors).horizontalList}
           />
         </View>
-
-        {/* Fast workout */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Fast workout</Text>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('fast_workout')}</Text>
           <FlatList
             data={DATA.fastWorkouts}
             renderItem={renderFastWorkout}
@@ -250,58 +251,50 @@ const DiscoverScreen = () => {
             scrollEnabled={false}
           />
         </View>
-
-        {/* Challenge */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Challenge</Text>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('challenge')}</Text>
           <FlatList
             data={DATA.challenges}
             renderItem={renderChallenge}
             keyExtractor={(item) => item.id}
             horizontal
             showsHorizontalScrollIndicator={false}
-            contentContainerStyle={styles.horizontalList}
+            contentContainerStyle={styles(colors).horizontalList}
           />
         </View>
-
-        {/* With equipment */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>With equipment</Text>
-          <View style={styles.equipmentContainer}>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('with_equipment')}</Text>
+          <View style={styles(colors).equipmentContainer}>
             <Image
               source={{
                 uri: 'https://storage.googleapis.com/a1aa/image/92f702eb-2777-4680-46b5-0aaba09b0310.jpg',
               }}
-              style={styles.equipmentImage}
+              style={styles(colors).equipmentImage}
             />
-            <TouchableOpacity style={styles.equipmentButton}>
+            <TouchableOpacity style={styles(colors).equipmentButton}>
               <Icon name="chevron-right" size={16} color={colors.card} />
             </TouchableOpacity>
           </View>
         </View>
-
-        {/* Body focus exercises */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Body focus</Text>
+        <View style={styles(colors).section}>
+          <Text style={styles(colors).sectionTitle}>{t('body_focus')}</Text>
           <FlatList
             data={DATA.bodyFocusData}
             renderItem={renderBodyFocusItem}
             keyExtractor={(item) => item.id}
             numColumns={2}
             scrollEnabled={false}
-            columnWrapperStyle={styles.bodyFocusRow}
+            columnWrapperStyle={styles(colors).bodyFocusRow}
           />
         </View>
-
-        {/* Body focus buttons */}
-        <View style={styles.section}>
+        <View style={styles(colors).section}>
           <FlatList
             data={DATA.bodyFocusButtons}
             renderItem={renderBodyFocusButton}
             keyExtractor={(item) => item.id}
             numColumns={2}
             scrollEnabled={false}
-            columnWrapperStyle={styles.focusButtonRow}
+            columnWrapperStyle={styles(colors).focusButtonRow}
           />
         </View>
       </ScrollView>
@@ -309,19 +302,7 @@ const DiscoverScreen = () => {
   );
 };
 
-const colors = {
-  primary: '#2563eb',
-  secondary: '#9ca3af',
-  background: '#f9fafb',
-  card: '#fff',
-  text: '#000',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  accent: '#f9d8a6',
-  accentText: '#6b4b00',
-};
-
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
@@ -357,7 +338,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   scrollContent: {
-    paddingTop: 60, // Adjust based on header height
+    paddingTop: 60,
     paddingHorizontal: 16,
   },
   mainBanner: {
@@ -596,7 +577,7 @@ const styles = StyleSheet.create({
   },
   focusButton: {
     width: (width - 48) / 2,
-    backgroundColor: '#1e293b',
+    backgroundColor: '#1e293b', // Updated below in styles to use colors.card
     borderRadius: 16,
     padding: 20,
     flexDirection: 'row',

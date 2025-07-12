@@ -1,17 +1,23 @@
-import React from 'react';
+// screens/layout/LayOutHome.js
+import React, { useContext } from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useNavigationState } from '@react-navigation/native';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
 export default function LayOutHome({ state, descriptors, navigation }) {
+  const { colors } = useContext(ThemeContext); // Get colors from ThemeContext
+  const { t } = useTranslation(); // Get translation function
+
   return (
-    <View style={styles.nav}>
+    <View style={styles(colors).nav}>
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
         const label =
           options.tabBarLabel !== undefined
-            ? options.tabBarLabel
-            : route.name;
+            ? t(options.tabBarLabel) // Translate tabBarLabel
+            : t(route.name); // Fallback to translated route name
 
         const isFocused = state.index === index;
 
@@ -37,15 +43,15 @@ export default function LayOutHome({ state, descriptors, navigation }) {
             accessibilityRole="button"
             accessibilityState={isFocused ? { selected: true } : {}}
             onPress={onPress}
-            style={styles.button}
+            style={styles(colors).button}
           >
             <FontAwesome5
               name={icons[route.name]}
               size={20}
-              solid={route.name === 'Report'} // chỉ 'Report' dùng solid icon
-              color={isFocused ? '#2563eb' : '#9ca3af'}
+              solid={route.name === 'Report'} // Only 'Report' uses solid icon
+              color={isFocused ? colors.primary : colors.secondary}
             />
-            <Text style={[styles.label, isFocused && styles.activeLabel]}>
+            <Text style={[styles(colors).label, isFocused && styles(colors).activeLabel]}>
               {label}
             </Text>
           </TouchableOpacity>
@@ -55,12 +61,12 @@ export default function LayOutHome({ state, descriptors, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   nav: {
     flexDirection: 'row',
-    backgroundColor: '#fff',
+    backgroundColor: colors.card, // Use card color for background
     borderTopWidth: 1,
-    borderTopColor: '#e5e7eb',
+    borderTopColor: colors.border,
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingVertical: 12,
@@ -70,11 +76,11 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: 12,
-    color: '#9ca3af',
+    color: colors.secondary, // Use secondary color for inactive labels
     fontWeight: '600',
     marginTop: 4,
   },
   activeLabel: {
-    color: '#2563eb',
+    color: colors.primary, // Use primary color for active labels
   },
 });

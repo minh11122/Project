@@ -1,6 +1,7 @@
-import React from 'react';
+// MainNavigator.js
+import * as React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import WorkoutScreen from '../screens/main/WorkoutScreen';
+import WorkoutStack from './WorkoutStack';
 import DiscoverScreen from '../screens/main/DiscoverScreen';
 import ReportScreen from '../screens/main/ReportScreen';
 import SettingsScreen from '../screens/main/SettingsScreen';
@@ -17,12 +18,12 @@ export default function MainNavigator() {
       screenOptions={{ headerShown: false }}
       tabBar={(props) => <LayOutHome {...props} />}
     >
-      <Tab.Screen name="Workout" component={WorkoutScreen} options={{ tabBarLabel: 'Tập luyện' }} />
-      <Tab.Screen name="Discover" component={DiscoverScreen} options={{ tabBarLabel: 'Khám phá' }} />
-      <Tab.Screen name="Report" component={ReportScreen} options={{ tabBarLabel: 'Báo cáo' }} />
+      <Tab.Screen name="Workout" component={WorkoutStack} options={{ tabBarLabel: 'Workout' }} />
+      <Tab.Screen name="Discover" component={DiscoverScreen} options={{ tabBarLabel: 'Discover' }} />
+      <Tab.Screen name="Report" component={ReportScreen} options={{ tabBarLabel: 'Report' }} />
       <Tab.Screen name="Chat" component={ChatGemeni} options={{ tabBarLabel: 'Chat' }} />
-      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Cài đặt' }} />
-      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Cá nhân' }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{ tabBarLabel: 'Settings' }} />
+      <Tab.Screen name="Profile" component={ProfileScreen} options={{ tabBarLabel: 'Profile' }} />
     </Tab.Navigator>
   );
 }

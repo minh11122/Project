@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import {
   View,
   Text,
@@ -15,11 +15,25 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { PhotoService } from '../../services/PhotoService';
 import { AIService } from '../../services/AIService';
+import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { useTranslation } from 'react-i18next';
 
 export default function ChatGemeni() {
+  const { colors } = useContext(ThemeContext);
+  const { t, i18n } = useTranslation();
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
+  const [language, setLanguage] = useState(i18n.language);
   const scrollViewRef = useRef(null);
+
+  useEffect(() => {
+    const onLanguageChange = () => {
+      console.log('Language changed in ChatGemeni:', i18n.language);
+      setLanguage(i18n.language);
+    };
+    i18n.on('languageChanged', onLanguageChange);
+    return () => i18n.off('languageChanged', onLanguageChange);
+  }, [i18n]);
 
   const sendMessage = async () => {
     if (!input.trim()) return;
@@ -34,7 +48,7 @@ export default function ChatGemeni() {
     } catch (err) {
       setMessages((prev) => [
         ...prev,
-        { role: 'gemini', text: 'Đã xảy ra lỗi khi gọi Gemini API' },
+        { role: 'gemini', text: t('gemini_api_error') },
       ]);
     }
   };
@@ -45,7 +59,7 @@ export default function ChatGemeni() {
 
     const userMsg = {
       role: 'user',
-      text: '[Ảnh đã được gửi]',
+      text: t('photo_sent'),
       photo,
     };
     setMessages((prev) => [...prev, userMsg]);
@@ -60,10 +74,10 @@ export default function ChatGemeni() {
   }, [messages]);
 
   const Header = () => (
-    <View style={styles.header}>
-      <Text style={styles.headerTitle}>TRÒ CHUYỆN</Text>
+    <View style={styles(colors).header}>
+      <Text style={styles(colors).headerTitle}>{t('chat')}</Text>
       <TouchableOpacity onPress={handleTakePhoto}>
-        <View style={styles.iconButton}>
+        <View style={styles(colors).iconButton}>
           <Ionicons name="camera-outline" size={20} color={colors.text} />
         </View>
       </TouchableOpacity>
@@ -71,26 +85,25 @@ export default function ChatGemeni() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.fixedHeaderContainer}>
+    <SafeAreaView style={styles(colors).container}>
+      <View style={styles(colors).fixedHeaderContainer}>
         <Header />
       </View>
-
       <KeyboardAvoidingView
-        style={styles.chatContainer}
+        style={styles(colors).chatContainer}
         behavior={Platform.select({ ios: 'padding', android: undefined })}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : -200}
       >
         <ScrollView
           ref={scrollViewRef}
-          style={styles.chatArea}
-          contentContainerStyle={styles.chatContent}
+          style={styles(colors).chatArea}
+          contentContainerStyle={styles(colors).chatContent}
           showsVerticalScrollIndicator={false}
         >
           {messages.length === 0 ? (
-            <View style={styles.emptyState}>
-              <Text style={styles.emptyStateText}>
-                Bắt đầu trò chuyện với Gemini! Gõ tin nhắn của bạn dưới đây.
+            <View style={styles(colors).emptyState}>
+              <Text style={styles(colors).emptyStateText}>
+                {t('empty_state_text')}
               </Text>
             </View>
           ) : (
@@ -98,8 +111,8 @@ export default function ChatGemeni() {
               <View
                 key={index}
                 style={[
-                  styles.message,
-                  msg.role === 'user' ? styles.userMessage : styles.geminiMessage,
+                  styles(colors).message,
+                  msg.role === 'user' ? styles(colors).userMessage : styles(colors).geminiMessage,
                 ]}
               >
                 {msg.photo && (
@@ -108,21 +121,20 @@ export default function ChatGemeni() {
                     style={{ width: 200, height: 150, borderRadius: 12, marginBottom: 8 }}
                   />
                 )}
-                <Text style={styles.messageText}>{msg.text}</Text>
+                <Text style={styles(colors).messageText}>{msg.text}</Text>
               </View>
             ))
           )}
         </ScrollView>
-
-        <View style={styles.inputArea}>
+        <View style={styles(colors).inputArea}>
           <TextInput
             value={input}
             onChangeText={setInput}
-            placeholder="Nhập tin nhắn..."
-            style={styles.input}
+            placeholder={t('input_placeholder')}
+            style={styles(colors).input}
             placeholderTextColor={colors.muted}
           />
-          <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
+          <TouchableOpacity onPress={sendMessage} style={styles(colors).sendButton}>
             <Ionicons name="send" size={20} color={colors.card} />
           </TouchableOpacity>
         </View>
@@ -131,19 +143,7 @@ export default function ChatGemeni() {
   );
 }
 
-const colors = {
-  primary: '#2563eb',
-  secondary: '#9ca3af',
-  background: '#f9fafb',
-  card: '#fff',
-  text: '#000',
-  muted: '#6b7280',
-  border: '#e5e7eb',
-  accent: '#f9d8a6',
-  accentText: '#6b4b00',
-};
-
-const styles = StyleSheet.create({
+const styles = (colors) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,

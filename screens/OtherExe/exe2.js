@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
 import { useTranslation } from 'react-i18next';
 
-const Exe1 = () => {
+const Exe2 = () => {
   const { colors } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState(i18n.language);
@@ -38,4 +38,4 @@ const styles = (colors) => StyleSheet.create({
   },
 });
 
-export default Exe1;
+export default Exe2;
