@@ -5,7 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const resources = {
   vi: {
     translation: {
-      // Previous translations from WorkoutScreen.js, DiscoverScreen.js, ProfileScreen.js, ReportScreen.js, and others
       'SETTINGS': 'CÀI ĐẶT',
       'Backup & Restore': 'Sao lưu & Khôi phục',
       'Sign in and synchronize your data': 'Đăng nhập và đồng bộ dữ liệu',
@@ -49,23 +48,37 @@ const resources = {
       'legs': 'Chân',
       'shoulders': 'Vai',
       'build_muscle': 'Xây dựng cơ bắp',
+      'burn_fat': 'Đốt cháy mỡ',
+      'stay_fit': 'Giữ vóc dáng',
+      'increase_endurance': 'Tăng sức bền',
       'advanced': 'Nâng cao',
       'under_7_minutes': '<7 phút',
-      'burn_fat': 'Đốt cháy mỡ',
-      'over_15_minutes': '>15 phút',
       '7_to_15_minutes': '7-15 phút',
-      'beginner_abs': 'Bụng Người bắt đầu',
+      'over_15_minutes': '>15 phút',
+      'beginner_abs': 'Bụng - Người bắt đầu',
       'beginner_abs_duration': '20 phút · 16 Bài tập',
-      'intermediate_abs': 'Bụng Trung bình',
+      'intermediate_abs': 'Bụng - Trung bình',
       'intermediate_abs_duration': '29 phút · 21 Bài tập',
-      'advanced_abs': 'Bụng Nâng cao',
+      'advanced_abs': 'Bụng - Nâng cao',
       'advanced_abs_duration': '36 phút · 21 Bài tập',
+      'arm_workout': 'Tập cánh tay',
+      'arm_workout_duration': '25 phút · 18 Bài tập',
+      'chest_workout': 'Tập ngực',
+      'chest_workout_duration': '25 phút · 18 Bài tập',
+      'leg_workout': 'Tập chân',
+      'leg_workout_duration': '30 phút · 20 Bài tập',
+      'shoulder_workout': 'Tập vai',
+      'shoulder_workout_duration': '28 phút · 19 Bài tập',
       'advanced_butt_rounding': 'Nâng cao & làm tròn mông',
       'advanced_butt_rounding_subtitle': '7 phút · Người bắt đầu',
       'butt_shaping_toning': 'Tạo hình và làm săn chắc mông',
       'butt_shaping_toning_subtitle': '10 phút · Người bắt đầu',
       'quick_bigger_chest': 'Tập luyện ngực to hơn nhanh chóng',
       'quick_bigger_chest_subtitle': '11 phút · Trung bình',
+      'fat_burn_hiit': 'HIIT đốt mỡ',
+      'fat_burn_hiit_subtitle': '15 phút · Trung bình',
+      'endurance_run': 'Chạy tăng sức bền',
+      'endurance_run_subtitle': '20 phút · Nâng cao',
       'just_for_you': 'Chỉ dành cho bạn',
       'more': 'Thêm →',
       'stretch_warmup': 'Kéo giãn và khởi động',
@@ -137,7 +150,6 @@ const resources = {
       'jawline_exercises_desc': 'Bài tập mặt & yoga mặt cho đường hàm. Giảm cằm đôi & giảm mỡ mặt.',
       'ad': 'QUẢNG CÁO',
       'install': 'CÀI ĐẶT',
-      // New translations for ChatGemeni
       'chat': 'TRÒ CHUYỆN',
       'input_placeholder': 'Nhập tin nhắn...',
       'empty_state_text': 'Bắt đầu trò chuyện với Gemini! Gõ tin nhắn của bạn dưới đây.',
@@ -147,7 +159,6 @@ const resources = {
   },
   en: {
     translation: {
-      // Previous translations from WorkoutScreen.js, DiscoverScreen.js, ProfileScreen.js, ReportScreen.js, and others
       'SETTINGS': 'SETTINGS',
       'Backup & Restore': 'Backup & Restore',
       'Sign in and synchronize your data': 'Sign in and synchronize your data',
@@ -191,23 +202,37 @@ const resources = {
       'legs': 'Legs',
       'shoulders': 'Shoulders',
       'build_muscle': 'Build Muscle',
+      'burn_fat': 'Burn Fat',
+      'stay_fit': 'Stay Fit',
+      'increase_endurance': 'Increase Endurance',
       'advanced': 'Advanced',
       'under_7_minutes': '<7 minutes',
-      'burn_fat': 'Burn Fat',
-      'over_15_minutes': '>15 minutes',
       '7_to_15_minutes': '7-15 minutes',
+      'over_15_minutes': '>15 minutes',
       'beginner_abs': 'Beginner Abs',
       'beginner_abs_duration': '20 min · 16 Exercises',
       'intermediate_abs': 'Intermediate Abs',
       'intermediate_abs_duration': '29 min · 21 Exercises',
       'advanced_abs': 'Advanced Abs',
       'advanced_abs_duration': '36 min · 21 Exercises',
+      'arm_workout': 'Arm Workout',
+      'arm_workout_duration': '25 min · 18 Exercises',
+      'chest_workout': 'Chest Workout',
+      'chest_workout_duration': '25 min · 18 Exercises',
+      'leg_workout': 'Leg Workout',
+      'leg_workout_duration': '30 min · 20 Exercises',
+      'shoulder_workout': 'Shoulder Workout',
+      'shoulder_workout_duration': '28 min · 19 Exercises',
       'advanced_butt_rounding': 'Advanced & Butt Rounding',
       'advanced_butt_rounding_subtitle': '7 min · Beginner',
       'butt_shaping_toning': 'Butt Shaping & Toning',
       'butt_shaping_toning_subtitle': '10 min · Beginner',
       'quick_bigger_chest': 'Quick Bigger Chest Workout',
       'quick_bigger_chest_subtitle': '11 min · Intermediate',
+      'fat_burn_hiit': 'Fat Burn HIIT',
+      'fat_burn_hiit_subtitle': '15 min · Intermediate',
+      'endurance_run': 'Endurance Run',
+      'endurance_run_subtitle': '20 min · Advanced',
       'just_for_you': 'Just for You',
       'more': 'More →',
       'stretch_warmup': 'Stretch & Warm-up',
@@ -279,7 +304,6 @@ const resources = {
       'jawline_exercises_desc': 'Face exercise & face yoga for jawline. Reduce double chin & lose face fat.',
       'ad': 'AD',
       'install': 'INSTALL',
-      // New translations for ChatGemeni
       'chat': 'CHAT',
       'input_placeholder': 'Enter your message...',
       'empty_state_text': 'Start chatting with Gemini! Type your message below.',
@@ -305,10 +329,10 @@ const initializeLanguage = async () => {
     const savedLanguage = await AsyncStorage.getItem('language');
     if (savedLanguage) {
       await i18n.changeLanguage(savedLanguage);
-      console.log('Loaded language:', savedLanguage);
+      console.log('Đã tải ngôn ngữ:', savedLanguage);
     }
   } catch (error) {
-    console.error('Error loading language from AsyncStorage:', error);
+    console.error('Lỗi khi tải ngôn ngữ từ AsyncStorage:', error);
   }
 };
 

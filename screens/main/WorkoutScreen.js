@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
+import { ThemeContext } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 
 const { width } = Dimensions.get('window');
@@ -24,8 +24,8 @@ const DATA = {
     { icon: '📚', text: 'advanced' },
     { icon: '⏰', text: 'under_7_minutes' },
     { icon: '🔥', text: 'burn_fat' },
-    { icon: '⏰', text: 'over_15_minutes' },
     { icon: '⏰', text: '7_to_15_minutes' },
+    { icon: '⏰', text: 'over_15_minutes' },
   ],
   challengeData: [
     {
@@ -49,6 +49,7 @@ const DATA = {
       title: 'beginner_abs',
       duration: 'beginner_abs_duration',
       difficulty: 1,
+      category: 'abs',
       image: 'https://storage.googleapis.com/a1aa/image/143f04bc-4a90-4c7e-e9e6-f80198c04fcf.jpg',
     },
     {
@@ -56,6 +57,7 @@ const DATA = {
       title: 'intermediate_abs',
       duration: 'intermediate_abs_duration',
       difficulty: 2,
+      category: 'abs',
       image: 'https://storage.googleapis.com/a1aa/image/2d0d895c-60c1-4031-b4bc-5f1977902f03.jpg',
     },
     {
@@ -63,7 +65,40 @@ const DATA = {
       title: 'advanced_abs',
       duration: 'advanced_abs_duration',
       difficulty: 3,
+      category: 'abs',
       image: 'https://storage.googleapis.com/a1aa/image/b12d936d-e86d-41be-12a3-7cb241610130.jpg',
+    },
+    {
+      id: '4',
+      title: 'arm_workout',
+      duration: 'arm_workout_duration',
+      difficulty: 2,
+      category: 'arms',
+      image: 'https://storage.googleapis.com/a1aa/image/arm-workout.jpg',
+    },
+    {
+      id: '5',
+      title: 'chest_workout',
+      duration: 'chest_workout_duration',
+      difficulty: 2,
+      category: 'chest',
+      image: 'https://storage.googleapis.com/a1aa/image/chest-workout.jpg',
+    },
+    {
+      id: '6',
+      title: 'leg_workout',
+      duration: 'leg_workout_duration',
+      difficulty: 2,
+      category: 'legs',
+      image: 'https://storage.googleapis.com/a1aa/image/leg-workout.jpg',
+    },
+    {
+      id: '7',
+      title: 'shoulder_workout',
+      duration: 'shoulder_workout_duration',
+      difficulty: 3,
+      category: 'shoulders',
+      image: 'https://storage.googleapis.com/a1aa/image/shoulder-workout.jpg',
     },
   ],
   exerciseData: [
@@ -71,19 +106,36 @@ const DATA = {
       id: '1',
       title: 'advanced_butt_rounding',
       subtitle: 'advanced_butt_rounding_subtitle',
+      goal: 'build_muscle',
       image: 'https://storage.googleapis.com/a1aa/image/b73e0ce0-9469-4359-f7be-45c5995620f6.jpg',
     },
     {
       id: '2',
       title: 'butt_shaping_toning',
       subtitle: 'butt_shaping_toning_subtitle',
+      goal: 'build_muscle',
       image: 'https://storage.googleapis.com/a1aa/image/a5e0a963-0365-492a-0911-b88ff32dbebf.jpg',
     },
     {
       id: '3',
       title: 'quick_bigger_chest',
       subtitle: 'quick_bigger_chest_subtitle',
+      goal: 'build_muscle',
       image: 'https://storage.googleapis.com/a1aa/image/15fb23e5-fdae-41f9-1aff-9890c0cdc825.jpg',
+    },
+    {
+      id: '4',
+      title: 'fat_burn_hiit',
+      subtitle: 'fat_burn_hiit_subtitle',
+      goal: 'burn_fat',
+      image: 'https://storage.googleapis.com/a1aa/image/fat-burn-hiit.jpg',
+    },
+    {
+      id: '5',
+      title: 'endurance_run',
+      subtitle: 'endurance_run_subtitle',
+      goal: 'increase_endurance',
+      image: 'https://storage.googleapis.com/a1aa/image/endurance-run.jpg',
     },
   ],
   stretchData: [
@@ -118,12 +170,13 @@ const WorkoutScreen = ({ navigation }) => {
   const { colors } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState('abs');
+  const [activeGoal, setActiveGoal] = useState('build_muscle');
   const [searchText, setSearchText] = useState('');
   const [language, setLanguage] = useState(i18n.language);
 
   useEffect(() => {
     const onLanguageChange = () => {
-      console.log('Language changed in WorkoutScreen:', i18n.language);
+      console.log('Ngôn ngữ đã thay đổi trong WorkoutScreen:', i18n.language);
       setLanguage(i18n.language);
     };
     i18n.on('languageChanged', onLanguageChange);
@@ -243,7 +296,7 @@ const WorkoutScreen = ({ navigation }) => {
       <TouchableOpacity
         style={styles(colors).challengeButton}
         onPress={() => {
-          console.log('Navigating to:', item.title.includes('full_body_challenge') ? 'Exe1' : 'Exe2');
+          console.log('Chuyển hướng đến:', item.title.includes('full_body_challenge') ? 'Exe1' : 'Exe2');
           if (item.title.includes('full_body_challenge')) {
             navigation.navigate('Exe1');
           } else if (item.title.includes('upper_body_challenge')) {
@@ -299,6 +352,12 @@ const WorkoutScreen = ({ navigation }) => {
     </View>
   );
 
+  // Lọc bài tập theo tab được chọn
+  const filteredWorkoutData = DATA.workoutData.filter((item) => item.category === activeTab);
+
+  // Lọc bài tập theo mục tiêu được chọn
+  const filteredExerciseData = DATA.exerciseData.filter((item) => item.goal === activeGoal);
+
   return (
     <SafeAreaView style={styles(colors).container}>
       <View style={styles(colors).fixedHeaderContainer}>
@@ -341,7 +400,7 @@ const WorkoutScreen = ({ navigation }) => {
             ))}
           </ScrollView>
           <FlatList
-            data={DATA.workoutData}
+            data={filteredWorkoutData}
             renderItem={WorkoutItem}
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
@@ -392,19 +451,16 @@ const WorkoutScreen = ({ navigation }) => {
             showsHorizontalScrollIndicator={false}
             style={styles(colors).goalsContainer}
           >
-            {DATA.goals.map((goal, index) => (
+            {DATA.goals.map((goal) => (
               <TouchableOpacity
                 key={goal}
-                style={[
-                  styles(colors).goalButton,
-                  index === 0 ? styles(colors).activeGoalButton : styles(colors).inactiveGoalButton,
-                ]}
-                disabled={index !== 0}
+                style={[styles(colors).goalButton, activeGoal === goal ? styles(colors).activeGoalButton : styles(colors).inactiveGoalButton]}
+                onPress={() => setActiveGoal(goal)}
               >
                 <Text
                   style={[
                     styles(colors).goalButtonText,
-                    index === 0 ? styles(colors).activeGoalText : styles(colors).inactiveGoalText,
+                    activeGoal === goal ? styles(colors).activeGoalText : styles(colors).inactiveGoalText,
                   ]}
                 >
                   {t(goal)}
@@ -414,7 +470,7 @@ const WorkoutScreen = ({ navigation }) => {
           </ScrollView>
           <View style={styles(colors).exerciseCard}>
             <FlatList
-              data={DATA.exerciseData}
+              data={filteredExerciseData}
               renderItem={ExerciseItem}
               keyExtractor={(item) => item.id}
               scrollEnabled={false}
