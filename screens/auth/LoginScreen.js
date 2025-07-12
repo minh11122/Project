@@ -1,6 +1,15 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, TextInput, Alert } from 'react-native';
-import auServices from '../../services/AuServices'; // Adjust the import path as needed
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  TextInput,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import auServices from '../../services/auth.services';
 
 export default function LoginScreen({ navigation }) {
   const [emailOrPhone, setEmailOrPhone] = useState('');
@@ -16,13 +25,19 @@ export default function LoginScreen({ navigation }) {
     setLoading(true);
     try {
       const response = await auServices.login(emailOrPhone, password);
-      // Assuming the API returns a token or user data on successful login
+
       console.log('Login successful:', response);
-      // Navigate to the Setup screen or handle the response as needed
+      // Lưu token vào AsyncStorage
+      await AsyncStorage.setItem('token', response.token);
+
+      // Điều hướng tới trang Setup
       navigation.navigate('Setup');
     } catch (error) {
       console.error('Login error:', error);
-      Alert.alert('Lỗi đăng nhập', error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại');
+      Alert.alert(
+        'Lỗi đăng nhập',
+        error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại'
+      );
     } finally {
       setLoading(false);
     }
@@ -63,11 +78,9 @@ export default function LoginScreen({ navigation }) {
           onPress={handleLogin}
           disabled={loading}
         >
-          <Text style={styles.buttonText}>{loading ? 'Đang đăng nhập...' : 'Đăng nhập'}</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.buttonOutlineText}>Tạo tài khoản mới</Text>
+          <Text style={styles.buttonText}>
+            {loading ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.forgotButton} onPress={() => navigation.navigate('ForgotPassword')}>
@@ -80,12 +93,8 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.divider} />
         </View>
 
-        <TouchableOpacity style={styles.googleButton}>
-          <Image
-            source={{ uri: 'https://img.icons8.com/color/48/000000/google-logo.png' }}
-            style={styles.googleIcon}
-          />
-          <Text style={styles.googleButtonText}>Đăng nhập với Google</Text>
+        <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.buttonOutlineText}>Tạo tài khoản mới</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -182,24 +191,5 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 10,
     color: '#eee',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    borderRadius: 10,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
   },
 });
