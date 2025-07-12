@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const User = require("../models/userSchema ");
+const User = require("../models/userSchema");
 
 const login = async (req, res) => {
     try {
