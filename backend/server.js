@@ -4,6 +4,7 @@ require("dotenv").config();
 const connectDB = require("./configs/conectDB");
 const apiRoutes = require("./routes");
 
+
 const app = express();
 
 app.use(express.json());
@@ -14,6 +15,7 @@ app.use(cors({
 connectDB();
 
 app.use("/api", apiRoutes);
+
 
 const PORT = process.env.PORT_APP;
 const HOST = process.env.HOST_APP;

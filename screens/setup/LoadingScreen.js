@@ -1,18 +1,56 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
+  Alert,
 } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { FontAwesome5 } from "@expo/vector-icons";
+import fitnessProfileServices from "../../services/fitnessProfile.services"; 
 
 export default function ProgressPlanScreen({ navigation }) {
-  const progress = 55;
+  const [progress, setProgress] = useState(0);
   const strokeDasharray = 2 * Math.PI * 70;
   const strokeDashoffset = strokeDasharray * (1 - progress / 100);
+
+  useEffect(() => {
+    const simulateProgress = () => {
+      let value = 0;
+      const interval = setInterval(() => {
+        value += 5;
+        setProgress(value);
+        if (value >= 100) {
+          clearInterval(interval);
+          navigation.navigate("Main");
+        }
+      }, 200);
+    };
+
+    const createProfileAndStartProgress = async () => {
+      try {
+        const profileData = {
+          groupmuscle: "Ngực",
+          goal: "Tăng cơ",
+          feedback: "Muốn cải thiện cơ ngực và cơ tay",
+          workoutDaysPerWeek: 4,
+          level: "Người bắt đầu",
+        };
+
+        await fitnessProfileServices.createProfile(profileData);
+        console.log("✅ Tạo hồ sơ thành công");
+        simulateProgress();
+      } catch (error) {
+        console.error("❌ Lỗi tạo hồ sơ:", error);
+        Alert.alert("Lỗi", "Không thể tạo hồ sơ. Vui lòng đăng nhập lại.");
+        navigation.navigate("Login");
+      }
+    };
+
+    createProfileAndStartProgress();
+  }, []);
 
   return (
     <ImageBackground
@@ -81,9 +119,7 @@ export default function ProgressPlanScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
+  background: { flex: 1 },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.6)",
