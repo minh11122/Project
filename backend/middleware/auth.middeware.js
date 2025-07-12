@@ -1,20 +1,24 @@
 const jwt = require('jsonwebtoken');
 
-const authMiddleware = (req, res, next) => {
-  const authHeader = req.header('Authorization');
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return res.status(401).json({ message: 'Thiếu token xác thực' });
-  }
+const authenticateToken = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
 
-  const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({
+            message: 'Access token required'
+        });
+    }
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // lưu thông tin người dùng vào req
-    next();
-  } catch (error) {
-    return res.status(403).json({ message: 'Token không hợp lệ' });
-  }
+    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+        if (err) {
+            return res.status(403).json({
+                message: 'Invalid or expired token'
+            });
+        }
+        req.userId = decoded.userId;
+        next();
+    });
 };
 
-module.exports = authMiddleware;
+module.exports = { authenticateToken };
