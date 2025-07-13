@@ -1,9 +1,53 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, ImageBackground, TextInput } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  TextInput,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import auServices from '../../services/auth.services';
+
+// Validation schema using Yup
+const LoginSchema = Yup.object().shape({
+  emailOrPhone: Yup.string()
+    .required('Email hoặc số điện thoại là bắt buộc')
+    .test('email-or-phone', 'Email hoặc số điện thoại không hợp lệ', (value) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const phoneRegex = /^[0-9]{10,11}$/;
+      return emailRegex.test(value) || phoneRegex.test(value);
+    }),
+  password: Yup.string()
+    .required('Mật khẩu là bắt buộc')
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự'),
+});
 
 export default function LoginScreen({ navigation }) {
-  const [emailOrPhone, setEmailOrPhone] = useState('');
-  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = async (values, { setSubmitting }) => {
+    setLoading(true);
+    try {
+      const response = await auServices.login(values.emailOrPhone, values.password);
+      console.log('Login successful:', response);
+      await AsyncStorage.setItem('token', response.token);
+      navigation.navigate('Setup');
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert(
+        'Lỗi đăng nhập',
+        error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại'
+      );
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
+    }
+  };
 
   return (
     <ImageBackground
@@ -12,39 +56,59 @@ export default function LoginScreen({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-
       <View style={styles.container}>
         <Text style={styles.title}>Chào mừng đến với GymFit</Text>
         <Text style={styles.subtitle}>Đăng nhập để bắt đầu tập luyện</Text>
 
-        <TextInput
-          style={styles.input}
-          placeholder="Email hoặc SĐT"
-          placeholderTextColor="#aaa"
-          value={emailOrPhone}
-          onChangeText={setEmailOrPhone}
-        />
+        <Formik
+          initialValues={{ emailOrPhone: '', password: '' }}
+          validationSchema={LoginSchema}
+          onSubmit={handleLogin}
+        >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+            <View style={styles.form}>
+              <TextInput
+                style={[styles.input, touched.emailOrPhone && errors.emailOrPhone && styles.inputError]}
+                placeholder="Email hoặc SĐT"
+                placeholderTextColor="#aaa"
+                onChangeText={handleChange('emailOrPhone')}
+                onBlur={handleBlur('emailOrPhone')}
+                value={values.emailOrPhone}
+                autoCapitalize="none"
+              />
+              {touched.emailOrPhone && errors.emailOrPhone && (
+                <Text style={styles.errorText}>{errors.emailOrPhone}</Text>
+              )}
 
-        <TextInput
-          style={styles.input}
-          placeholder="Mật khẩu"
-          placeholderTextColor="#aaa"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
+              <TextInput
+                style={[styles.input, touched.password && errors.password && styles.inputError]}
+                placeholder="Mật khẩu"
+                placeholderTextColor="#aaa"
+                secureTextEntry
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+              />
+              {touched.password && errors.password && (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              )}
 
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Setup')}>
-          <Text style={styles.buttonText}>Đăng nhập</Text>
-        </TouchableOpacity>
+              <TouchableOpacity
+                style={[styles.button, (loading || isSubmitting) && styles.buttonDisabled]}
+                onPress={handleSubmit}
+                disabled={loading || isSubmitting}
+              >
+                <Text style={styles.buttonText}>
+                  {loading || isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Formik>
 
-        <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Register')}>
-          <Text style={styles.buttonOutlineText}>Tạo tài khoản mới</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.forgotButton} onPress={() => navigation.navigate('ForgotPassword')}>
+        {/* <TouchableOpacity style={styles.forgotButton} onPress={() => navigation.navigate('ForgotPassword')}>
           <Text style={styles.forgotText}>Quên mật khẩu?</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
 
         <View style={styles.dividerContainer}>
           <View style={styles.divider} />
@@ -52,12 +116,8 @@ export default function LoginScreen({ navigation }) {
           <View style={styles.divider} />
         </View>
 
-        <TouchableOpacity style={styles.googleButton}>
-          <Image
-            source={{ uri: 'https://img.icons8.com/color/48/000000/google-logo.png' }}
-            style={styles.googleIcon}
-          />
-          <Text style={styles.googleButtonText}>Đăng nhập với Google</Text>
+        <TouchableOpacity style={styles.buttonOutline} onPress={() => navigation.navigate('Register')}>
+          <Text style={styles.buttonOutlineText}>Tạo tài khoản mới</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
@@ -77,6 +137,9 @@ const styles = StyleSheet.create({
     padding: 24,
     justifyContent: 'center',
     alignItems: 'center',
+  },
+  form: {
+    width: '100%',
   },
   title: {
     fontSize: 28,
@@ -101,12 +164,26 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#000',
   },
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 12,
+    marginLeft: 16,
+  },
   button: {
     backgroundColor: '#1E90FF',
     paddingVertical: 14,
     borderRadius: 10,
     width: '100%',
     marginBottom: 12,
+  },
+  buttonDisabled: {
+    backgroundColor: '#87CEEB',
+    opacity: 0.7,
   },
   buttonText: {
     color: '#fff',
@@ -150,24 +227,5 @@ const styles = StyleSheet.create({
   dividerText: {
     marginHorizontal: 10,
     color: '#eee',
-  },
-  googleButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 12,
-    borderRadius: 10,
-    width: '100%',
-    justifyContent: 'center',
-  },
-  googleIcon: {
-    width: 24,
-    height: 24,
-    marginRight: 10,
-  },
-  googleButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#444',
   },
 });

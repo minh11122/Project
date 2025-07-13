@@ -6,16 +6,12 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  Platform,
   ImageBackground,
 } from "react-native";
-import { Picker } from "@react-native-picker/picker";
 
-export default function ActivityLevelScreen({ navigation }) {
-  const [selectedDays, setSelectedDays] = useState(7);
-  const [startDay, setStartDay] = useState("CHỦ NHẬT");
+export default function ActivityLevelScreen({ navigation, route }) {
+  const { gender, area, goal, motivation } = route.params || {};
 
-  const days = [1, 2, 3, 4, 5, 6, 7];
   const weekdays = [
     "CHỦ NHẬT",
     "THỨ HAI",
@@ -26,6 +22,29 @@ export default function ActivityLevelScreen({ navigation }) {
     "THỨ BẢY",
   ];
 
+  const [selectedWeekdays, setSelectedWeekdays] = useState([]);
+
+  const toggleDay = (day) => {
+    setSelectedWeekdays((prev) =>
+      prev.includes(day)
+        ? prev.filter((d) => d !== day)
+        : [...prev, day]
+    );
+  };
+
+  const handleNext = () => {
+    if (selectedWeekdays.length > 0) {
+      navigation.navigate("TrainingLevel", {
+        gender,
+        area,
+        goal,
+        motivation,
+        workoutDaysPerWeek: selectedWeekdays.length,
+        workoutDays: selectedWeekdays,
+      });
+    }
+  };
+
   return (
     <ImageBackground
       source={{
@@ -35,99 +54,62 @@ export default function ActivityLevelScreen({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
+
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Top Bar */}
-        <View style={styles.topBar}>
-          <Text style={styles.timeText}>10:18</Text>
-          <Image
-            source={{
-              uri: "https://storage.googleapis.com/a1aa/image/ab87b3de-31f9-48e3-d3e8-34b3dba13ba2.jpg",
-            }}
-            style={styles.topBarIcon}
-          />
-        </View>
-
-        {/* Progress */}
-        <View style={styles.progressContainer}>
-          <View style={styles.progressBarBg}>
-            <View style={styles.progressBarFill} />
-          </View>
-        </View>
-
-        {/* Navigation */}
+        {/* Header */}
         <View style={styles.nav}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
             <Text style={styles.backButton}>←</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("TrainingLevel")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("TrainingLevel", {
+                gender,
+                area,
+                goal,
+                motivation,
+              })
+            }
+          >
             <Text style={styles.skipButton}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
 
         {/* Title */}
-        <Text style={styles.title}>Đặt mục tiêu hàng tuần{"\n"}của bạn</Text>
+        <Text style={styles.title}>Chọn các ngày bạn muốn tập</Text>
         <Text style={styles.description}>
-          Chúng tôi khuyến nghị tập ít nhất 3 ngày mỗi tuần để có kết quả tốt hơn.
+          Nên tập ít nhất 3 ngày/tuần để đạt hiệu quả tốt hơn
         </Text>
 
-        {/* Weekly Days */}
-        <View style={styles.labelWithIcon}>
-          <Image
-            source={{
-              uri: "https://storage.googleapis.com/a1aa/image/1723e14b-7ed5-4cf7-df60-5888584ab9da.jpg",
-            }}
-            style={styles.labelIcon}
-          />
-          <Text style={styles.labelText}>Ngày tập luyện hàng tuần</Text>
-        </View>
-
+        {/* Weekday Selector */}
         <View style={styles.daysContainer}>
-          {days.map((d) => (
-            <TouchableOpacity
-              key={d}
-              style={[styles.dayButton, selectedDays === d && styles.dayButtonSelected]}
-              onPress={() => setSelectedDays(d)}
-            >
-              <Text
-                style={[styles.dayText, selectedDays === d && styles.dayTextSelected]}
+          {weekdays.map((day, index) => {
+            const isSelected = selectedWeekdays.includes(day);
+            return (
+              <TouchableOpacity
+                key={index}
+                style={[styles.dayButton, isSelected && styles.dayButtonSelected]}
+                onPress={() => toggleDay(day)}
               >
-                {d}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text
+                  style={[styles.dayText, isSelected && styles.dayTextSelected]}
+                >
+                  {day}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
 
-        <View style={styles.separator} />
-
-        {/* Start Day Picker */}
-        <View style={styles.labelWithIcon}>
-          <Image
-            source={{
-              uri: "https://storage.googleapis.com/a1aa/image/4b10ca22-e8c9-42c9-2e68-2c3c2cd245e3.jpg",
-            }}
-            style={styles.labelIcon}
-          />
-          <Text style={styles.labelText}>Ngày bắt đầu trong tuần</Text>
-        </View>
-
-        <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={startDay}
-            dropdownIconColor="#fff"
-            onValueChange={(itemValue) => setStartDay(itemValue)}
-            style={{ color: "#fff" }}
-          >
-            {weekdays.map((day) => (
-              <Picker.Item key={day} label={day} value={day} />
-            ))}
-          </Picker>
-        </View>
-
-        {/* Button */}
+        {/* Footer */}
         <View style={styles.buttonContainer}>
           <TouchableOpacity
-            style={styles.bottomButton}
-            onPress={() => navigation.navigate("TrainingLevel")}
+            style={[
+              styles.bottomButton,
+              selectedWeekdays.length === 0 && styles.bottomButtonDisabled,
+            ]}
+            onPress={handleNext}
+            disabled={selectedWeekdays.length === 0}
           >
             <Text style={styles.bottomButtonText}>TIẾP THEO</Text>
           </TouchableOpacity>
@@ -136,6 +118,7 @@ export default function ActivityLevelScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -146,42 +129,13 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 40,
-  },
-  topBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 8,
-    gap: 8,
-    paddingHorizontal: 16,
-  },
-  timeText: {
-    color: "#fff",
-    fontSize: 14,
-  },
-  topBarIcon: {
-    width: 16,
-    height: 16,
-  },
-  progressContainer: {
-    paddingHorizontal: 16,
-    marginTop: 4,
-  },
-  progressBarBg: {
-    height: 8,
-    backgroundColor: "#6b7280",
-    borderRadius: 9999,
-  },
-  progressBarFill: {
-    height: 8,
-    width: "70%",
-    backgroundColor: "#22c55e",
-    borderRadius: 9999,
+    paddingHorizontal: 24,
+    paddingTop: 48,
   },
   nav: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    padding: 16,
+    marginBottom: 16,
   },
   backButton: {
     fontSize: 24,
@@ -190,93 +144,64 @@ const styles = StyleSheet.create({
   },
   skipButton: {
     fontSize: 16,
-    color: "#fff",
+    color: "#ccc",
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "800",
     textAlign: "center",
     color: "#fff",
-    marginBottom: 8,
+    marginBottom: 12,
   },
   description: {
     fontSize: 16,
     color: "#ccc",
     textAlign: "center",
-    paddingHorizontal: 24,
     marginBottom: 24,
-  },
-  labelWithIcon: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    marginBottom: 12,
-  },
-  labelIcon: {
-    width: 20,
-    height: 20,
-  },
-  labelText: {
-    fontSize: 16,
-    color: "#fff",
   },
   daysContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "center",
     gap: 12,
-    marginBottom: 24,
   },
   dayButton: {
-    width: 56,
-    height: 56,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
     borderRadius: 16,
     borderWidth: 1,
     borderColor: "#d1d5db",
-    alignItems: "center",
-    justifyContent: "center",
     backgroundColor: "rgba(255,255,255,0.1)",
+    margin: 6,
   },
   dayButtonSelected: {
-    backgroundColor: "#22c55e",
-    borderColor: "transparent",
+    backgroundColor: "#4ade80",
+    borderColor: "#4ade80",
   },
   dayText: {
-    fontSize: 20,
-    fontWeight: "800",
+    fontSize: 16,
+    fontWeight: "700",
     color: "#fff",
   },
   dayTextSelected: {
     color: "#000",
   },
-  separator: {
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 24,
-    marginHorizontal: 32,
-  },
-  pickerContainer: {
-    marginHorizontal: 24,
-    borderWidth: Platform.OS === "android" ? 1 : 0,
-    borderColor: "#ccc",
-    borderRadius: 16,
-    overflow: "hidden",
-    backgroundColor: "rgba(255,255,255,0.1)",
-  },
   buttonContainer: {
+    marginTop: 32,
     paddingHorizontal: 24,
-    paddingTop: 32,
   },
   bottomButton: {
     backgroundColor: "#22c55e",
-    borderRadius: 9999,
+    borderRadius: 999,
     paddingVertical: 16,
     alignItems: "center",
   },
+  bottomButtonDisabled: {
+    backgroundColor: "#6b7280",
+  },
   bottomButtonText: {
     color: "#000",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "800",
   },
 });

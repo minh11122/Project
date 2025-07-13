@@ -9,10 +9,20 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function FocusAreaScreen({ navigation }) {
+export default function FocusAreaScreen({ navigation, route }) {
   const [selectedArea, setSelectedArea] = useState(null);
+  const { gender } = route.params || {};
 
-  const areas = ["Toàn thân", "Cánh tay", "Ngực", "Bụng", "Chân"];
+  const areas = ["Toàn thân", "Tay", "Ngực", "Bụng", "Chân", "Vai", "Lưng"];
+
+  const handleNext = () => {
+    if (selectedArea) {
+      navigation.navigate("Goal", {
+        area: selectedArea,
+        gender,
+      });
+    }
+  };
 
   return (
     <ImageBackground
@@ -33,7 +43,13 @@ export default function FocusAreaScreen({ navigation }) {
           <View style={styles.progressBarContainer}>
             <View style={styles.progressBar} />
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate("Goal")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Goal", {
+                gender, // ✅ vẫn giữ gender khi bỏ qua
+              })
+            }
+          >
             <Text style={styles.skipText}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
@@ -79,10 +95,12 @@ export default function FocusAreaScreen({ navigation }) {
           <TouchableOpacity
             style={[
               styles.nextButton,
-              selectedArea ? styles.nextButtonActive : styles.nextButtonDisabled,
+              selectedArea
+                ? styles.nextButtonActive
+                : styles.nextButtonDisabled,
             ]}
             disabled={!selectedArea}
-            onPress={() => navigation.navigate("Goal", { area: selectedArea })}
+            onPress={handleNext} // ✅ dùng handleNext
           >
             <Text style={styles.nextButtonText}>TIẾP THEO</Text>
           </TouchableOpacity>
@@ -91,6 +109,7 @@ export default function FocusAreaScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,

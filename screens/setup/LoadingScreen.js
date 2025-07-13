@@ -1,18 +1,54 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
   TouchableOpacity,
   StyleSheet,
   ImageBackground,
+  Alert,
 } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { FontAwesome5 } from "@expo/vector-icons";
+import fitnessProfileServices from "../../services/fitnessProfile.services";
 
-export default function ProgressPlanScreen({ navigation }) {
-  const progress = 55;
+export default function ProgressPlanScreen({ navigation, route }) {
+  const [progress, setProgress] = useState(0);
+  const profileData = route.params.profileData;
   const strokeDasharray = 2 * Math.PI * 70;
   const strokeDashoffset = strokeDasharray * (1 - progress / 100);
+
+  useEffect(() => {
+    const simulateProgress = () => {
+      let value = 0;
+      const interval = setInterval(() => {
+        value += 5;
+        setProgress(value);
+        if (value >= 100) {
+          clearInterval(interval);
+          navigation.navigate("Main"); 
+        }
+      }, 200);
+    };
+
+    const createProfileAndStartProgress = async () => {
+      if (!profileData) {
+        console.log(profileData);
+        navigation.navigate("Home");
+        return;
+      }
+
+      try {
+        await fitnessProfileServices.createFitnessProfile(profileData);
+        simulateProgress();
+      } catch (error) {
+        console.log(profileData);
+        Alert.alert("Lỗi", error.message || "Không thể tạo hồ sơ.");
+        navigation.navigate("Login");
+      }
+    };
+
+    createProfileAndStartProgress();
+  }, []);
 
   return (
     <ImageBackground
@@ -24,7 +60,7 @@ export default function ProgressPlanScreen({ navigation }) {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH {"\n"}CHO BẠN</Text>
+        <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH{"\n"}CHO BẠN</Text>
         <Text style={styles.description}>
           Đang chuẩn bị kế hoạch dựa trên mục tiêu của bạn...
         </Text>
@@ -54,20 +90,22 @@ export default function ProgressPlanScreen({ navigation }) {
           <Text style={styles.progressText}>{progress}%</Text>
         </View>
 
-        {/* Info */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoLine}>
-            <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
-            Phân tích cơ thể của bạn:{" "}
-            <Text style={styles.highlightBlue}>169cm</Text>,{" "}
-            <Text style={styles.highlightBlue}>50.0kg</Text>
-          </Text>
-          <Text style={styles.infoLine}>
-            <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
-            Điều chỉnh cấp độ thể dục:{" "}
-            <Text style={styles.highlightStrong}>Người bắt đầu</Text>
-          </Text>
-        </View>
+        {/* Thông tin hồ sơ */}
+        {profileData && (
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoLine}>
+              <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
+              Phân tích cơ thể:{" "}
+              <Text style={styles.highlightBlue}>{profileData.height}cm</Text>,{" "}
+              <Text style={styles.highlightBlue}>{profileData.weight}kg</Text>
+            </Text>
+            <Text style={styles.infoLine}>
+              <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
+              Cấp độ thể dục:{" "}
+              <Text style={styles.highlightStrong}>{profileData.level}</Text>
+            </Text>
+          </View>
+        )}
 
         <TouchableOpacity
           style={styles.button}
@@ -81,9 +119,7 @@ export default function ProgressPlanScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
+  background: { flex: 1 },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.6)",

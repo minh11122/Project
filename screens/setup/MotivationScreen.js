@@ -9,8 +9,10 @@ import {
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 
-export default function MotivationScreen({ navigation }) {
+export default function MotivationScreen({ navigation, route }) {
   const [selected, setSelected] = useState(null);
+
+  const { gender, area, goal } = route.params || {};
 
   const options = [
     { emoji: "😁", label: "Cảm thấy tự tin" },
@@ -18,6 +20,17 @@ export default function MotivationScreen({ navigation }) {
     { emoji: "💪", label: "Cải thiện sức khỏe" },
     { emoji: "🌞", label: "Tăng cường năng lượng" },
   ];
+
+  const handleNext = () => {
+    if (selected) {
+      navigation.navigate("ActivityLevel", {
+        gender,
+        area,
+        goal,
+        motivation: selected,
+      });
+    }
+  };
 
   return (
     <ImageBackground
@@ -40,7 +53,15 @@ export default function MotivationScreen({ navigation }) {
             <View style={styles.progressBar} />
           </View>
 
-          <TouchableOpacity onPress={() => navigation.navigate("ActivityLevel")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("ActivityLevel", {
+                gender,
+                area,
+                goal,
+              })
+            }
+          >
             <Text style={styles.skipText}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
@@ -79,7 +100,7 @@ export default function MotivationScreen({ navigation }) {
               styles.nextButton,
               !selected && styles.nextButtonDisabled,
             ]}
-            onPress={() => navigation.navigate("ActivityLevel")}
+            onPress={handleNext}
             disabled={!selected}
           >
             <Text style={styles.nextButtonText}>TIẾP THEO</Text>
@@ -89,6 +110,7 @@ export default function MotivationScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
