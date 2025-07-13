@@ -11,33 +11,56 @@ import { Ionicons } from "@expo/vector-icons";
 
 const options = [
   {
-    id: "option1",
+    id: "low",
     emoji: "👨‍💻",
     label: "Ít vận động",
     description: "Tôi ngồi tại bàn làm việc cả ngày",
   },
   {
-    id: "option2",
+    id: "light",
     emoji: "🚶‍♂️",
     label: "Hơi tích cực",
     description: "Tôi đi bộ hoặc tập thể dục nhẹ nhàng hàng ngày",
   },
   {
-    id: "option3",
+    id: "moderate",
     emoji: "🏃‍♂️",
     label: "Tích cực vừa phải",
     description: "Tôi tập thể dục thường xuyên và có hoạt động thể chất",
   },
   {
-    id: "option4",
+    id: "very_active",
     emoji: "🥰",
     label: "Rất tích cực",
     description: "Tôi tập thể dục mạnh mẽ và thường xuyên",
   },
 ];
 
-export default function SetGoalScreen({ navigation }) {
-  const [selected, setSelected] = useState("option1");
+export default function SetGoalScreen({ navigation, route }) {
+  const {
+    gender,
+    area,
+    goal,
+    motivation,
+    workoutDaysPerWeek,
+    workoutDays,
+    level,
+  } = route.params || {};
+
+  const [selected, setSelected] = useState("low");
+
+  const handleNext = () => {
+    navigation.navigate("HeightWeight", {
+      gender,
+      area,
+      goal,
+      motivation,
+      workoutDaysPerWeek,
+      workoutDays,
+      level,
+      activityLevel: selected,
+    });
+  };
 
   return (
     <ImageBackground
@@ -58,7 +81,7 @@ export default function SetGoalScreen({ navigation }) {
           <View style={styles.progressContainer}>
             <View style={styles.progressBar} />
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleNext}>
             <Text style={styles.skipButton}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
@@ -72,7 +95,10 @@ export default function SetGoalScreen({ navigation }) {
             return (
               <TouchableOpacity
                 key={option.id}
-                style={[styles.option, isSelected ? styles.selected : styles.unselected]}
+                style={[
+                  styles.option,
+                  isSelected ? styles.selected : styles.unselected,
+                ]}
                 onPress={() => setSelected(option.id)}
               >
                 <View style={styles.optionContent}>
@@ -105,10 +131,7 @@ export default function SetGoalScreen({ navigation }) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("HeightWeight")}
-          >
+          <TouchableOpacity style={styles.submitButton} onPress={handleNext}>
             <Text style={styles.submitText}>TIẾP THEO</Text>
           </TouchableOpacity>
         </View>

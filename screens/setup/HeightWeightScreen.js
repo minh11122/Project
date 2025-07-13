@@ -11,11 +11,37 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import Slider from '@react-native-community/slider';
 
-export default function HeightWeightScreen({ navigation }) {
-  const [weightUnit, setWeightUnit] = useState('kg');
-  const [heightUnit, setHeightUnit] = useState('cm');
-  const [weight, setWeight] = useState(75.0);
-  const [height, setHeight] = useState(175);
+export default function HeightWeightScreen({ navigation, route }) {
+  const {
+    gender,
+    area, // groupmuscle
+    goal,
+    motivation,
+    workoutDaysPerWeek,
+    workoutDays,
+    level,
+    activityLevel,
+  } = route.params || {};
+
+  const [weight, setWeight] = useState(75.0); // kg
+  const [height, setHeight] = useState(175);  // cm
+
+  const handleNext = () => {
+    const data = {
+      gender,
+      groupmuscle: area,
+      goal,
+      motivation,
+      workoutDaysPerWeek,
+      workoutDays,
+      level,
+      activityLevel,
+      weight: parseFloat(weight.toFixed(1)),
+      height: parseFloat(height.toFixed(1)),
+    };
+
+    navigation.navigate('Loading', { profileData: data });
+  };
 
   return (
     <ImageBackground
@@ -44,29 +70,11 @@ export default function HeightWeightScreen({ navigation }) {
 
           {/* Weight section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Cân nặng</Text>
-              <View style={styles.toggle}>
-                <TouchableOpacity
-                  style={[styles.toggleButton, weightUnit === 'kg' && styles.active]}
-                  onPress={() => setWeightUnit('kg')}
-                >
-                  <Text style={weightUnit === 'kg' ? styles.activeText : styles.inactiveText}>kg</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.toggleButton, weightUnit === 'lbs' && styles.active]}
-                  onPress={() => setWeightUnit('lbs')}
-                >
-                  <Text style={weightUnit === 'lbs' ? styles.activeText : styles.inactiveText}>lbs</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
+            <Text style={styles.sectionTitle}>Cân nặng (kg)</Text>
             <View style={styles.valueDisplay}>
               <Text style={styles.value}>{weight.toFixed(1)}</Text>
-              <Text style={styles.unit}>{weightUnit}</Text>
+              <Text style={styles.unit}>kg</Text>
             </View>
-
             <Slider
               style={{ width: '100%', height: 40 }}
               minimumValue={30}
@@ -82,29 +90,11 @@ export default function HeightWeightScreen({ navigation }) {
 
           {/* Height section */}
           <View style={styles.section}>
-            <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>Chiều cao</Text>
-              <View style={styles.toggle}>
-                <TouchableOpacity
-                  style={[styles.toggleButton, heightUnit === 'cm' && styles.active]}
-                  onPress={() => setHeightUnit('cm')}
-                >
-                  <Text style={heightUnit === 'cm' ? styles.activeText : styles.inactiveText}>cm</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={[styles.toggleButton, heightUnit === 'ft' && styles.active]}
-                  onPress={() => setHeightUnit('ft')}
-                >
-                  <Text style={heightUnit === 'ft' ? styles.activeText : styles.inactiveText}>ft</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-
+            <Text style={styles.sectionTitle}>Chiều cao (cm)</Text>
             <View style={styles.valueDisplay}>
               <Text style={styles.value}>{height}</Text>
-              <Text style={styles.unit}>{heightUnit}</Text>
+              <Text style={styles.unit}>cm</Text>
             </View>
-
             <Slider
               style={{ width: '100%', height: 40 }}
               minimumValue={120}
@@ -121,7 +111,7 @@ export default function HeightWeightScreen({ navigation }) {
           {/* NEXT button */}
           <TouchableOpacity
             style={styles.startButton}
-            onPress={() => navigation.navigate('Loading')}
+            onPress={handleNext}
           >
             <Text style={styles.startText}>TIẾP THEO</Text>
           </TouchableOpacity>
@@ -132,9 +122,7 @@ export default function HeightWeightScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  background: {
-    flex: 1,
-  },
+  background: { flex: 1 },
   overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.6)',
@@ -182,37 +170,11 @@ const styles = StyleSheet.create({
     maxWidth: 300,
     marginBottom: 40,
   },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-    paddingHorizontal: 4,
-  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '900',
     color: '#fff',
-  },
-  toggle: {
-    flexDirection: 'row',
-    backgroundColor: '#e5e7eb',
-    borderRadius: 9999,
-  },
-  toggleButton: {
-    paddingVertical: 4,
-    paddingHorizontal: 12,
-  },
-  active: {
-    backgroundColor: '#2563eb',
-    borderRadius: 9999,
-  },
-  activeText: {
-    color: '#fff',
-    fontWeight: '600',
-  },
-  inactiveText: {
-    color: '#6b7280',
-    fontWeight: '600',
+    marginBottom: 8,
   },
   valueDisplay: {
     flexDirection: 'row',

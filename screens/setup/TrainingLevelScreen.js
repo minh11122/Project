@@ -9,7 +9,16 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-export default function TrainingLevelScreen({ navigation }) {
+export default function TrainingLevelScreen({ navigation, route }) {
+  const {
+    gender,
+    area,
+    goal,
+    motivation,
+    workoutDaysPerWeek,
+    workoutDays,
+  } = route.params || {};
+
   const [selectedOption, setSelectedOption] = useState("beginner");
 
   const options = [
@@ -33,6 +42,18 @@ export default function TrainingLevelScreen({ navigation }) {
     },
   ];
 
+  const handleNext = () => {
+    navigation.navigate("SetGoal", {
+      gender,
+      area,
+      goal,
+      motivation,
+      workoutDaysPerWeek,
+      workoutDays,
+      level: selectedOption,
+    });
+  };
+
   return (
     <ImageBackground
       source={{
@@ -52,12 +73,12 @@ export default function TrainingLevelScreen({ navigation }) {
           <View style={styles.progressBarContainer}>
             <View style={styles.progressBar} />
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleNext}>
             <Text style={styles.skipText}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
 
-        {/* Main content */}
+        {/* Main */}
         <ScrollView contentContainerStyle={styles.main}>
           <Text style={styles.title}>Bạn có thể chống đẩy{"\n"}bao nhiêu lần một lúc?</Text>
 
@@ -98,10 +119,7 @@ export default function TrainingLevelScreen({ navigation }) {
 
         {/* Footer */}
         <View style={styles.footer}>
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => navigation.navigate("SetGoal")}
-          >
+          <TouchableOpacity style={styles.submitButton} onPress={handleNext}>
             <Text style={styles.submitButtonText}>TIẾP THEO</Text>
           </TouchableOpacity>
         </View>
