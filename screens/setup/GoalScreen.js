@@ -10,23 +10,38 @@ import {
 } from "react-native";
 import { Ionicons, FontAwesome } from "@expo/vector-icons";
 
-export default function GoalScreen({ navigation }) {
-  const [selectedGoal, setSelectedGoal] = useState("Xây dựng cơ\nbắp");
+export default function GoalScreen({ navigation, route }) {
+  const [selectedGoal, setSelectedGoal] = useState(null);
 
+  const { gender, area } = route.params || {}; 
   const goals = [
     {
       title: "Giảm cân",
-      image: "https://login.medlatec.vn//ImagePath/images/20201113/20201113_tap-gym-giam-can-nam-1.jpg",
+      image:
+        "https://login.medlatec.vn//ImagePath/images/20201113/20201113_tap-gym-giam-can-nam-1.jpg",
     },
     {
-      title: "Xây dựng cơ\nbắp",
-      image: "https://mdfitness.vn/4725841D002D6361/B2FE80C04D5485C94725885A000DAD14/$File/tap-gym-tang-co-bap.jpg",
+      title: "Xây dựng cơ bắp",
+      image:
+        "https://mdfitness.vn/4725841D002D6361/B2FE80C04D5485C94725885A000DAD14/$File/tap-gym-tang-co-bap.jpg",
     },
     {
       title: "Giữ dáng",
-      image: "https://cdnphoto.dantri.com.vn/LuGGoiO-DSaWpRXH2hhFoF9J8_M=/thumb_w/1320/2021/06/06/hoa-hau-hhen-nie-va-loat-sao-viet-cham-chi-tap-the-thao-giu-dang-khi-gian-cach-xa-hoi-1-1622964618935.jpeg",
+      image:
+        "https://cdnphoto.dantri.com.vn/LuGGoiO-DSaWpRXH2hhFoF9J8_M=/thumb_w/1320/2021/06/06/hoa-hau-hhen-nie-va-loat-sao-viet-cham-chi-tap-the-thao-giu-dang-khi-gian-cach-xa-hoi-1-1622964618935.jpeg",
     },
   ];
+
+  // ✅ Tạo hàm điều hướng giống các màn trước
+  const handleNext = () => {
+    if (selectedGoal) {
+      navigation.navigate("Motivation", {
+        gender,
+        area,
+        goal: selectedGoal,
+      });
+    }
+  };
 
   return (
     <ImageBackground
@@ -49,7 +64,14 @@ export default function GoalScreen({ navigation }) {
             <View style={styles.progressBar} />
           </View>
 
-          <TouchableOpacity onPress={() => navigation.navigate("Motivation")}>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate("Motivation", {
+                gender,
+                area,
+              })
+            }
+          >
             <Text style={styles.skipText}>Bỏ qua</Text>
           </TouchableOpacity>
         </View>
@@ -88,8 +110,12 @@ export default function GoalScreen({ navigation }) {
         {/* Footer */}
         <View style={styles.footer}>
           <TouchableOpacity
-            style={styles.nextButton}
-            onPress={() => navigation.navigate("Motivation", { goal: selectedGoal })}
+            style={[
+              styles.nextButton,
+              selectedGoal ? styles.nextButtonActive : styles.nextButtonDisabled,
+            ]}
+            disabled={!selectedGoal}
+            onPress={handleNext} // ✅ dùng hàm giống gender
           >
             <Text style={styles.nextButtonText}>TIẾP THEO</Text>
           </TouchableOpacity>
@@ -98,6 +124,7 @@ export default function GoalScreen({ navigation }) {
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -196,11 +223,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   nextButton: {
-    backgroundColor: "#22c55e",
     borderRadius: 999,
     paddingVertical: 16,
     alignItems: "center",
     width: "100%",
+  },
+  nextButtonActive: {
+    backgroundColor: "#22c55e",
+  },
+  nextButtonDisabled: {
+    backgroundColor: "#6b7280",
   },
   nextButtonText: {
     color: "white",
