@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import WorkoutScreen from '../screens/main/WorkoutScreen';
 import Exe1 from '../screens/OtherExe/exe1';
 import Exe2 from '../screens/OtherExe/exe2';
+import StartWorkoutScreen from '../screens/OtherExe/StartWorkoutScreen';
+import ExerciseScreen from '../screens/OtherExe/ExerciseScreen'; // Add new screen
 
 const Stack = createStackNavigator();
 
@@ -37,7 +39,7 @@ const WorkoutStack = () => {
         component={WorkoutScreen}
         options={{
           title: t('home_workout'),
-          headerShown: false, // Ẩn header để giữ giao diện tab
+          headerShown: false,
         }}
       />
       <Stack.Screen
@@ -54,6 +56,24 @@ const WorkoutStack = () => {
         component={Exe2}
         options={{
           title: t('upper_body_challenge_7x4'),
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="StartWorkout"
+        component={StartWorkoutScreen}
+        options={{
+          title: t('start_workout'),
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="Exercise"
+        component={ExerciseScreen}
+        options={{
+          title: t('exercise'),
           headerStyle: { backgroundColor: colors.card },
           headerTintColor: colors.text,
         }}
