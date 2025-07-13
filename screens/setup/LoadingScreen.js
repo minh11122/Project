@@ -9,10 +9,11 @@ import {
 } from "react-native";
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { FontAwesome5 } from "@expo/vector-icons";
-import fitnessProfileServices from "../../services/fitnessProfile.services"; 
+import fitnessProfileServices from "../../services/fitnessProfile.services";
 
-export default function ProgressPlanScreen({ navigation }) {
+export default function ProgressPlanScreen({ navigation, route }) {
   const [progress, setProgress] = useState(0);
+  const profileData = route.params.profileData;
   const strokeDasharray = 2 * Math.PI * 70;
   const strokeDashoffset = strokeDasharray * (1 - progress / 100);
 
@@ -24,27 +25,24 @@ export default function ProgressPlanScreen({ navigation }) {
         setProgress(value);
         if (value >= 100) {
           clearInterval(interval);
-          navigation.navigate("Main");
+          navigation.navigate("Main"); 
         }
       }, 200);
     };
 
     const createProfileAndStartProgress = async () => {
-      try {
-        const profileData = {
-          groupmuscle: "Ngực",
-          goal: "Tăng cơ",
-          feedback: "Muốn cải thiện cơ ngực và cơ tay",
-          workoutDaysPerWeek: 4,
-          level: "Người bắt đầu",
-        };
+      if (!profileData) {
+        console.log(profileData);
+        navigation.navigate("Home");
+        return;
+      }
 
-        await fitnessProfileServices.createProfile(profileData);
-        console.log("✅ Tạo hồ sơ thành công");
+      try {
+        await fitnessProfileServices.createFitnessProfile(profileData);
         simulateProgress();
       } catch (error) {
-        console.error("❌ Lỗi tạo hồ sơ:", error);
-        Alert.alert("Lỗi", "Không thể tạo hồ sơ. Vui lòng đăng nhập lại.");
+        console.log(profileData);
+        Alert.alert("Lỗi", error.message || "Không thể tạo hồ sơ.");
         navigation.navigate("Login");
       }
     };
@@ -62,7 +60,7 @@ export default function ProgressPlanScreen({ navigation }) {
     >
       <View style={styles.overlay} />
       <View style={styles.container}>
-        <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH {"\n"}CHO BẠN</Text>
+        <Text style={styles.title}>ĐANG TẠO KẾ HOẠCH{"\n"}CHO BẠN</Text>
         <Text style={styles.description}>
           Đang chuẩn bị kế hoạch dựa trên mục tiêu của bạn...
         </Text>
@@ -92,20 +90,22 @@ export default function ProgressPlanScreen({ navigation }) {
           <Text style={styles.progressText}>{progress}%</Text>
         </View>
 
-        {/* Info */}
-        <View style={styles.infoContainer}>
-          <Text style={styles.infoLine}>
-            <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
-            Phân tích cơ thể của bạn:{" "}
-            <Text style={styles.highlightBlue}>169cm</Text>,{" "}
-            <Text style={styles.highlightBlue}>50.0kg</Text>
-          </Text>
-          <Text style={styles.infoLine}>
-            <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
-            Điều chỉnh cấp độ thể dục:{" "}
-            <Text style={styles.highlightStrong}>Người bắt đầu</Text>
-          </Text>
-        </View>
+        {/* Thông tin hồ sơ */}
+        {profileData && (
+          <View style={styles.infoContainer}>
+            <Text style={styles.infoLine}>
+              <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
+              Phân tích cơ thể:{" "}
+              <Text style={styles.highlightBlue}>{profileData.height}cm</Text>,{" "}
+              <Text style={styles.highlightBlue}>{profileData.weight}kg</Text>
+            </Text>
+            <Text style={styles.infoLine}>
+              <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
+              Cấp độ thể dục:{" "}
+              <Text style={styles.highlightStrong}>{profileData.level}</Text>
+            </Text>
+          </View>
+        )}
 
         <TouchableOpacity
           style={styles.button}
