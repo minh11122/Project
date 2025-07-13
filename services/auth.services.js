@@ -12,6 +12,17 @@ const auServices = {
         const response = await api.post('/auth/signin', { username, password });
         return response.data;
     },
+
+    register: async ({ email, phone, fullName, password, confirmPassword }) => {
+        const response = await api.post('/auth/register', {
+            email,
+            phone,
+            fullName,
+            password,
+            confirmPassword
+        });
+        return response.data;
+    },
 };
 
 export default auServices;

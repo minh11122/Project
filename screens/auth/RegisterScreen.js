@@ -6,31 +6,54 @@ import {
   StyleSheet,
   TextInput,
   ImageBackground,
+  Alert,
 } from 'react-native';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
+import auServices from '../../services/auth.services';
+
+// Validation schema using Yup
+const RegisterSchema = Yup.object().shape({
+  fullName: Yup.string().required('Họ và tên là bắt buộc'),
+  email: Yup.string()
+    .email('Email không hợp lệ')
+    .required('Email là bắt buộc'),
+  phone: Yup.string()
+    .matches(/^[0-9]{10,11}$/, 'Số điện thoại không hợp lệ')
+    .required('Số điện thoại là bắt buộc'),
+  password: Yup.string()
+    .min(6, 'Mật khẩu phải có ít nhất 6 ký tự')
+    .required('Mật khẩu là bắt buộc'),
+  confirmPassword: Yup.string()
+    .oneOf([Yup.ref('password'), null], 'Mật khẩu xác nhận không khớp')
+    .required('Xác nhận mật khẩu là bắt buộc'),
+});
 
 export default function RegisterScreen({ navigation }) {
-  const [name, setName] = useState('');
-  const [contact, setContact] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [verifyCode, setVerifyCode] = useState('');
-  const [message, setMessage] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleVerify = () => {
-    if (!contact) {
-      setMessage('Vui lòng nhập email hoặc số điện thoại để xác minh.');
-    } else {
-      setMessage(`✅ Đã gửi mã xác minh tới ${contact}`);
-    }
-  };
-
-  const handleRegister = () => {
-    if (!name || !contact || !password || !confirmPassword || !verifyCode) {
-      setMessage('❗ Vui lòng điền đầy đủ thông tin.');
-    } else if (password !== confirmPassword) {
-      setMessage('❗ Mật khẩu không khớp.');
-    } else {
-      setMessage('🎉 Đăng ký thành công!');
+  const handleRegister = async (values, { setSubmitting }) => {
+    setLoading(true);
+    try {
+      const response = await auServices.register({
+        email: values.email,
+        phone: values.phone,
+        fullName: values.fullName,
+        password: values.password,
+        confirmPassword: values.confirmPassword,
+      });
+      Alert.alert('Thành công', response.message || 'Đăng ký thành công!', [
+        { text: 'OK', onPress: () => navigation.navigate('Login') },
+      ]);
+    } catch (error) {
+      console.error('Register error:', error);
+      Alert.alert(
+        'Lỗi đăng ký',
+        error.response?.data?.message || 'Đã có lỗi xảy ra, vui lòng thử lại'
+      );
+    } finally {
+      setLoading(false);
+      setSubmitting(false);
     }
   };
 
@@ -43,70 +66,108 @@ export default function RegisterScreen({ navigation }) {
       resizeMode="cover"
     >
       <View style={styles.overlay} />
-
       <View style={styles.container}>
         <Text style={styles.title}>Tạo tài khoản mới</Text>
 
-        {message !== '' && <Text style={styles.alert}>{message}</Text>}
-
-        <TextInput
-          style={styles.input}
-          placeholder="Họ và tên"
-          placeholderTextColor="#ccc"
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Email hoặc Số điện thoại"
-          placeholderTextColor="#ccc"
-          keyboardType="email-address"
-          value={contact}
-          onChangeText={setContact}
-        />
-        <TouchableOpacity style={styles.verifyButton} onPress={handleVerify}>
-          <Text style={styles.verifyText}>Gửi mã xác minh</Text>
-        </TouchableOpacity>
-
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập mã xác minh"
-          placeholderTextColor="#ccc"
-          value={verifyCode}
-          onChangeText={setVerifyCode}
-        />
-
-        <TextInput
-          style={styles.input}
-          placeholder="Mật khẩu"
-          placeholderTextColor="#ccc"
-          secureTextEntry
-          value={password}
-          onChangeText={setPassword}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nhập lại mật khẩu"
-          placeholderTextColor="#ccc"
-          secureTextEntry
-          value={confirmPassword}
-          onChangeText={setConfirmPassword}
-        />
-
-        <TouchableOpacity style={styles.registerButton} onPress={handleRegister}>
-          <Text style={styles.registerButtonText}>Đăng ký</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => navigation.goBack()}
+        <Formik
+          initialValues={{
+            fullName: '',
+            email: '',
+            phone: '',
+            password: '',
+            confirmPassword: '',
+          }}
+          validationSchema={RegisterSchema}
+          onSubmit={handleRegister}
         >
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched, isSubmitting }) => (
+            <View style={styles.form}>
+              <TextInput
+                style={[styles.input, touched.fullName && errors.fullName && styles.inputError]}
+                placeholder="Họ và tên"
+                placeholderTextColor="#ccc"
+                onChangeText={handleChange('fullName')}
+                onBlur={handleBlur('fullName')}
+                value={values.fullName}
+              />
+              {touched.fullName && errors.fullName && (
+                <Text style={styles.errorText}>{errors.fullName}</Text>
+              )}
+
+              <TextInput
+                style={[styles.input, touched.email && errors.email && styles.inputError]}
+                placeholder="Email"
+                placeholderTextColor="#ccc"
+                keyboardType="email-address"
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                value={values.email}
+                autoCapitalize="none"
+              />
+              {touched.email && errors.email && (
+                <Text style={styles.errorText}>{errors.email}</Text>
+              )}
+
+              <TextInput
+                style={[styles.input, touched.phone && errors.phone && styles.inputError]}
+                placeholder="Số điện thoại"
+                placeholderTextColor="#ccc"
+                keyboardType="phone-pad"
+                onChangeText={handleChange('phone')}
+                onBlur={handleBlur('phone')}
+                value={values.phone}
+              />
+              {touched.phone && errors.phone && (
+                <Text style={styles.errorText}>{errors.phone}</Text>
+              )}
+
+              <TextInput
+                style={[styles.input, touched.password && errors.password && styles.inputError]}
+                placeholder="Mật khẩu"
+                placeholderTextColor="#ccc"
+                secureTextEntry
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                value={values.password}
+              />
+              {touched.password && errors.password && (
+                <Text style={styles.errorText}>{errors.password}</Text>
+              )}
+
+              <TextInput
+                style={[styles.input, touched.confirmPassword && errors.confirmPassword && styles.inputError]}
+                placeholder="Nhập lại mật khẩu"
+                placeholderTextColor="#ccc"
+                secureTextEntry
+                onChangeText={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
+                value={values.confirmPassword}
+              />
+              {touched.confirmPassword && errors.confirmPassword && (
+                <Text style={styles.errorText}>{errors.confirmPassword}</Text>
+              )}
+
+              <TouchableOpacity
+                style={[styles.registerButton, (loading || isSubmitting) && styles.buttonDisabled]}
+                onPress={handleSubmit}
+                disabled={loading || isSubmitting}
+              >
+                <Text style={styles.registerButtonText}>
+                  {loading || isSubmitting ? 'Đang đăng ký...' : 'Đăng ký'}
+                </Text>
+              </TouchableOpacity>
+            </View>
+          )}
+        </Formik>
+
+        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Login')}>
           <Text style={styles.backText}>← Quay lại đăng nhập</Text>
         </TouchableOpacity>
       </View>
     </ImageBackground>
   );
 }
+
 const styles = StyleSheet.create({
   background: {
     flex: 1,
@@ -121,22 +182,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  form: {
+    width: '100%',
+  },
   title: {
     fontSize: 28,
     fontWeight: 'bold',
     color: '#fff',
     marginBottom: 16,
     textAlign: 'center',
-  },
-  alert: {
-    backgroundColor: 'rgba(255,255,255,0.2)',
-    color: '#fff',
-    fontSize: 14,
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 16,
-    textAlign: 'center',
-    width: '100%',
   },
   input: {
     backgroundColor: 'rgba(255,255,255,0.1)',
@@ -149,14 +203,15 @@ const styles = StyleSheet.create({
     width: '100%',
     marginBottom: 12,
   },
-  verifyButton: {
-    alignSelf: 'flex-end',
-    marginBottom: 12,
+  inputError: {
+    borderColor: 'red',
+    borderWidth: 1,
   },
-  verifyText: {
-    color: '#1E90FF',
-    fontSize: 14,
-    fontWeight: '500',
+  errorText: {
+    color: 'red',
+    fontSize: 12,
+    marginBottom: 12,
+    marginLeft: 16,
   },
   registerButton: {
     backgroundColor: '#FF6B00',
@@ -164,6 +219,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     marginBottom: 16,
+  },
+  buttonDisabled: {
+    backgroundColor: '#FF9B4D',
+    opacity: 0.7,
   },
   registerButtonText: {
     color: '#fff',
