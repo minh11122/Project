@@ -1,32 +1,8 @@
 const FitnessProfile = require('../models/fitnessProfileSchema');
 
-// POST: /api/fitness-profile
 const createFitnessProfile = async (req, res) => {
   try {
     const {
-      userId,
-      gender,
-      groupmuscle,
-      goal,
-      motivation,
-      workoutDaysPerWeek,
-      activityLevel,
-      level,
-      weight,
-      height
-    } = req.body;
-
-    // Kiểm tra dữ liệu đầu vào
-    if (
-      !userId || !gender || !groupmuscle || !goal || !motivation ||
-      !workoutDaysPerWeek || !activityLevel || !level || !weight || !height
-    ) {
-      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin' });
-    }
-
-    // Tạo bản ghi mới
-    const newProfile = new FitnessProfile({
-      userId,
       gender,
       groupmuscle,
       goal,
@@ -36,24 +12,52 @@ const createFitnessProfile = async (req, res) => {
       level,
       weight,
       height,
+    } = req.body;
+
+    const userId = req.userId;
+
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Chưa xác thực người dùng' });
+    }
+
+    if (
+      !gender || !groupmuscle || !goal || !motivation ||
+      workoutDaysPerWeek == null || !activityLevel || !level
+    ) {
+      return res.status(400).json({ success: false, message: 'Vui lòng cung cấp đầy đủ thông tin' });
+    }
+
+    const existingProfile = await FitnessProfile.findOne({ userId });
+    if (existingProfile) {
+      return res.status(400).json({ success: false, message: 'Bạn đã tạo hồ sơ trước đó' });
+    }
+
+    const newProfile = new FitnessProfile({
+      userId,
+      gender,
+      groupmuscle,
+      goal,
+      motivation,
+      workoutDaysPerWeek,
+      activityLevel: activityLevel.toLowerCase(),
+      level: level.toLowerCase(),
+      weight,
+      height,
     });
 
-    // BMI sẽ được tính trong middleware
-    const savedProfile = await newProfile.save();
+    await newProfile.save();
 
     return res.status(201).json({
       success: true,
-      message: 'Tạo hồ sơ thể chất thành công',
-      data: savedProfile,
+      message: 'Tạo hồ sơ thành công',
+      profile: newProfile,
     });
   } catch (error) {
-    console.error('Lỗi tạo hồ sơ thể chất:', error);
-    return res.status(500).json({
-      success: false,
-      message: 'Đã xảy ra lỗi khi tạo hồ sơ thể chất',
-    });
+    console.error('Lỗi tạo fitness profile:', error);
+    return res.status(500).json({ success: false, message: 'Lỗi server', error: error.message });
   }
 };
+
 module.exports = {
   createFitnessProfile,
 };

@@ -1,8 +1,47 @@
-import React from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  SafeAreaView,
+  Alert,
+} from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
+import UserService from '../../services/user.services';
 
 export default function ProfileScreen({ navigation }) {
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const userData = await UserService.getUserById();
+        setUser(userData);
+      } catch (err) {
+        console.error('Lỗi khi lấy thông tin người dùng:', err);
+        Alert.alert('Lỗi', err.message || 'Không thể tải thông tin người dùng');
+      }
+    };
+
+    fetchUser();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('token');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (error) {
+      Alert.alert('Lỗi', 'Không thể đăng xuất. Vui lòng thử lại.');
+    }
+  };
+
   const Header = () => (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>TRANG CÁ NHÂN</Text>
@@ -16,29 +55,27 @@ export default function ProfileScreen({ navigation }) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Fixed Header */}
       <View style={styles.fixedHeaderContainer}>
         <Header />
       </View>
 
-      {/* Scrollable Content */}
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.scrollContent}
       >
-        {/* Avatar & Info */}
         <View style={styles.profileSection}>
           <View style={styles.avatarContainer}>
             <Image
-              source={{ uri: 'https://i.pravatar.cc/150?img=3' }}
+              source={{
+                uri: user?.avatar || 'https://i.pravatar.cc/150?img=3',
+              }}
               style={styles.avatar}
             />
           </View>
-          <Text style={styles.name}>Nguyễn Văn A</Text>
-          <Text style={styles.email}>nguyenvana@example.com</Text>
+          <Text style={styles.name}>{user?.fullname || 'Đang tải...'}</Text>
+          <Text style={styles.email}>{user?.email || '...'}</Text>
         </View>
 
-        {/* Actions */}
         <View style={styles.actions}>
           <TouchableOpacity style={[styles.actionButton, styles.editButton]}>
             <Text style={styles.buttonText}>Chỉnh sửa thông tin</Text>
@@ -46,7 +83,10 @@ export default function ProfileScreen({ navigation }) {
           <TouchableOpacity style={[styles.actionButton, styles.goalButton]}>
             <Text style={styles.buttonText}>Mục tiêu của tôi</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, styles.logoutButton]}>
+          <TouchableOpacity
+            style={[styles.actionButton, styles.logoutButton]}
+            onPress={handleLogout}
+          >
             <Text style={styles.buttonText}>Đăng xuất</Text>
           </TouchableOpacity>
         </View>
@@ -54,6 +94,7 @@ export default function ProfileScreen({ navigation }) {
     </SafeAreaView>
   );
 }
+
 
 const colors = {
   primary: '#2563eb',

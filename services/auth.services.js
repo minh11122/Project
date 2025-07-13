@@ -14,7 +14,7 @@ const auServices = {
     },
 
     register: async ({ email, phone, fullName, password, confirmPassword }) => {
-        const response = await api.post('/auth/register', {
+        const response = await api.post('/auth/signup', {
             email,
             phone,
             fullName,
