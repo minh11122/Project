@@ -27,6 +27,42 @@ const login = async (req, res) => {
     }
 };
 
+const register = async (req, res) => {
+    try {
+        const { email, phone, fullName, password, confirmPassword } = req.body;
+        
+        if (!email || !phone || !fullName || !password || !confirmPassword) {
+            return res.status(400).json({ message: "Vui lòng điền đầy đủ thông tin" });
+        }
+
+        if (password !== confirmPassword) {
+            return res.status(400).json({ message: "Mật khẩu và xác nhận mật khẩu không khớp" });
+        }
+
+        const existingUser = await User.findOne({ $or: [{ email }, { phone }] });
+        if (existingUser) {
+            return res.status(400).json({ message: "Email hoặc số điện thoại đã tồn tại" });
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        await User.create({
+            email,
+            phone,
+            fullname: fullName,
+            password: hashedPassword,
+            picture: ""
+        });
+
+        return res.status(201).json({ message: "Đăng ký thành công" });
+
+    } catch (error) {
+        console.error("Lỗi khi đăng ký:", error);
+        return res.status(500).json({ message: "Đăng ký thất bại" });
+    }
+};
+
 module.exports = {
-    login
+    login,
+    register
 };
