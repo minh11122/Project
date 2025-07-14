@@ -312,14 +312,38 @@ const WorkoutScreen = ({ navigation }) => {
   );
 
   const WorkoutItem = ({ item }) => (
-    <View style={styles(colors).workoutItem}>
+    <TouchableOpacity
+      style={styles(colors).workoutItem}
+      onPress={() => {
+        // Map category to Vietnamese
+        const categoryMap = {
+          'abs': 'Bụng',
+          'arms': 'Tay',
+          'chest': 'Ngực',
+          'legs': 'Chân',
+          'shoulders': 'Vai'
+        };
+        
+        // Map difficulty to level
+        const levelMap = {
+          1: 'beginner',
+          2: 'intermediate',
+          3: 'advanced'
+        };
+        
+        const category = categoryMap[item.category] || item.category;
+        const level = levelMap[item.difficulty] || 'beginner';
+        
+        navigation.navigate('ExerciseList', { category, level });
+      }}
+    >
       <Image source={{ uri: item.image }} style={styles(colors).workoutImage} />
       <View style={styles(colors).workoutInfo}>
         <Text style={styles(colors).workoutTitle}>{t(item.title)}</Text>
         <Text style={styles(colors).workoutDuration}>{t(item.duration)}</Text>
         {renderDifficultyStars(item.difficulty)}
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
   const ExerciseItem = ({ item }) => (

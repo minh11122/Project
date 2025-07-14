@@ -7,7 +7,9 @@ import WorkoutScreen from '../screens/main/WorkoutScreen';
 import Exe1 from '../screens/OtherExe/exe1';
 import Exe2 from '../screens/OtherExe/exe2';
 import StartWorkoutScreen from '../screens/OtherExe/StartWorkoutScreen';
-import ExerciseScreen from '../screens/OtherExe/ExerciseScreen'; // Add new screen
+import ExerciseScreen from '../screens/OtherExe/ExerciseScreen';
+import ExerciseListScreen from '../screens/OtherExe/ExerciseListScreen';
+import ExerciseDetailScreen from '../screens/OtherExe/ExerciseDetailScreen';
 
 const Stack = createStackNavigator();
 
@@ -74,6 +76,24 @@ const WorkoutStack = () => {
         component={ExerciseScreen}
         options={{
           title: t('exercise'),
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="ExerciseList"
+        component={ExerciseListScreen}
+        options={{
+          title: 'Danh sách bài tập',
+          headerStyle: { backgroundColor: colors.card },
+          headerTintColor: colors.text,
+        }}
+      />
+      <Stack.Screen
+        name="ExerciseDetail"
+        component={ExerciseDetailScreen}
+        options={{
+          title: 'Chi tiết bài tập',
           headerStyle: { backgroundColor: colors.card },
           headerTintColor: colors.text,
         }}

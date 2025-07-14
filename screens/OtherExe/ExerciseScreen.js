@@ -30,7 +30,7 @@ const ExerciseScreen = () => {
   const currentExercise = exercises[currentExerciseIndex] || {
     name: t('no_exercise'),
     duration: '00:00',
-    image: 'https://via.placeholder.com/48',
+    imageUrl: null,
   };
 
   // Parse duration to seconds
@@ -125,13 +125,20 @@ const ExerciseScreen = () => {
           <FontAwesome5 name="arrow-left" size={18} color={colors.icon || '#4B5563'} />
         </TouchableOpacity>
 
-        <Image
-          source={{ uri: currentExercise.image }}
-          style={styles(colors).image}
-          resizeMode="contain"
-          accessible
-          accessibilityLabel={t('exercise_image', { name: currentExercise.name })}
-        />
+        {currentExercise.imageUrl ? (
+          <Image
+            source={{ uri: currentExercise.imageUrl }}
+            style={styles(colors).image}
+            resizeMode="contain"
+            accessible
+            accessibilityLabel={t('exercise_image', { name: currentExercise.name })}
+          />
+        ) : (
+          <View style={styles(colors).imagePlaceholder}>
+            <FontAwesome5 name="dumbbell" size={60} color={colors.muted} />
+            <Text style={styles(colors).placeholderText}>Không có ảnh</Text>
+          </View>
+        )}
 
         <View style={styles(colors).topRightButtons}>
           <TouchableOpacity style={styles(colors).iconButton} accessibilityLabel={t('video')}>
@@ -235,6 +242,21 @@ const styles = (colors) => StyleSheet.create({
   image: {
     width: width * 0.7,
     height: width * 0.7,
+  },
+  imagePlaceholder: {
+    width: width * 0.7,
+    height: width * 0.7,
+    backgroundColor: colors.card || '#F3F4F6',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: colors.border || '#E5E7EB',
+  },
+  placeholderText: {
+    fontSize: 16,
+    color: colors.muted || '#6B7280',
+    marginTop: 12,
   },
   backButton: {
     position: 'absolute',
