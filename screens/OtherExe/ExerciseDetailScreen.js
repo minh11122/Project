@@ -34,7 +34,7 @@ const ExerciseDetailScreen = () => {
   }
 
   const handleStartExercise = () => {
-    navigation.navigate('ExerciseScreen', { exercises: [exercise] });
+    navigation.navigate('Exercise', { exercises: [exercise] });
   };
 
   const renderHeader = () => (
