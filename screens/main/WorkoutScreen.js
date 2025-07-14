@@ -75,7 +75,7 @@ const DATA = {
       duration: 'arm_workout_duration',
       difficulty: 2,
       category: 'arms',
-      image: 'https://storage.googleapis.com/a1aa/image/arm-workout.jpg',
+      image: 'https://tse3.mm.bing.net/th/id/OIP.isK1Nx_4InImb2ClriNYIwHaFt?rs=1&pid=ImgDetMain&o=7&rm=3',
     },
     {
       id: '5',
@@ -83,7 +83,7 @@ const DATA = {
       duration: 'chest_workout_duration',
       difficulty: 2,
       category: 'chest',
-      image: 'https://storage.googleapis.com/a1aa/image/chest-workout.jpg',
+      image: 'https://tse3.mm.bing.net/th/id/OIP.zsXVlIufkCZoESkyBvd4EAAAAA?rs=1&pid=ImgDetMain&o=7&rm=3',
     },
     {
       id: '6',
@@ -91,7 +91,7 @@ const DATA = {
       duration: 'leg_workout_duration',
       difficulty: 2,
       category: 'legs',
-      image: 'https://storage.googleapis.com/a1aa/image/leg-workout.jpg',
+      image: 'https://www.eatthis.com/wp-content/uploads/sites/4/2023/03/muscular-man-leg-press.jpg?quality=82&strip=all&w=640',
     },
     {
       id: '7',
@@ -99,7 +99,7 @@ const DATA = {
       duration: 'shoulder_workout_duration',
       difficulty: 3,
       category: 'shoulders',
-      image: 'https://storage.googleapis.com/a1aa/image/shoulder-workout.jpg',
+      image: 'https://tse4.mm.bing.net/th/id/OIP.QBJdXF2HyfityA1oq6zlLQHaE8?rs=1&pid=ImgDetMain&o=7&rm=3',
     },
   ],
   exerciseData: [
@@ -224,18 +224,18 @@ const WorkoutScreen = ({ navigation }) => {
     </View>
   );
 
-  const SearchBar = () => (
-    <View style={styles(colors).searchContainer}>
-      <Text style={styles(colors).searchIcon}>🔍</Text>
-      <TextInput
-        style={styles(colors).searchInput}
-        placeholder={t('search_placeholder')}
-        placeholderTextColor={colors.muted}
-        value={searchText}
-        onChangeText={setSearchText}
-      />
-    </View>
-  );
+  // const SearchBar = () => (
+  //   <View style={styles(colors).searchContainer}>
+  //     <Text style={styles(colors).searchIcon}>🔍</Text>
+  //     <TextInput
+  //       style={styles(colors).searchInput}
+  //       placeholder={t('search_placeholder')}
+  //       placeholderTextColor={colors.muted}
+  //       value={searchText}
+  //       onChangeText={setSearchText}
+  //     />
+  //   </View>
+  // );
 
   const WeeklyGoal = () => {
     const today = new Date();
@@ -406,7 +406,7 @@ const WorkoutScreen = ({ navigation }) => {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles(colors).scrollContent}
       >
-        <SearchBar />
+        {/* <SearchBar /> */}
         <WeeklyGoal />
         <View style={styles(colors).challengeSection}>
           <Text style={styles(colors).sectionTitle}>{t('7x4_challenge')}</Text>
@@ -444,14 +444,6 @@ const WorkoutScreen = ({ navigation }) => {
             keyExtractor={(item) => item.id}
             scrollEnabled={false}
           />
-          <View style={styles(colors).tagsContainer}>
-            {DATA.tags.map((tag, index) => (
-              <TouchableOpacity key={index} style={styles(colors).tag}>
-                <Text style={styles(colors).tagIcon}>{tag.icon}</Text>
-                <Text style={styles(colors).tagText}>{t(tag.text)}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
         </View>
         <View style={styles(colors).recommendSection}>
           <View style={styles(colors).sectionHeader}>
