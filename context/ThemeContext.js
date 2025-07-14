@@ -51,6 +51,7 @@ export const ThemeProvider = ({ children }) => {
       icon: '#4b5563',
       disabled: '#9ca3af',
       helpText: '#4b5563',
+      error: '#ef4444',
     },
     dark: {
       primary: '#60a5fa',
@@ -70,6 +71,7 @@ export const ThemeProvider = ({ children }) => {
       icon: '#9ca3af',
       disabled: '#6b7280',
       helpText: '#9ca3af',
+      error: '#f87171',
     },
   };
 

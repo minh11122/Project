@@ -14,6 +14,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import fitnessProfileServices from "../../services/fitnessProfile.services";
+import exerciseServices from "../../services/exercise.services";
 
 const { width } = Dimensions.get('window');
 
@@ -175,6 +176,16 @@ const WorkoutScreen = ({ navigation }) => {
   const [searchText, setSearchText] = useState('');
   const [language, setLanguage] = useState(i18n.language);
   const [fitnessProfile, setFitnessProfile] = useState(null);
+  const [beginnerExercises, setBeginnerExercises] = useState([]);
+  const [intermediateExercises, setIntermediateExercises] = useState([]);
+  const [advancedExercises, setAdvancedExercises] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [showAllExercises, setShowAllExercises] = useState({
+    beginner: false,
+    intermediate: false,
+    advanced: false
+  });
 
   useEffect(() => {
     const fetchFitnessProfile = async () => {
@@ -188,7 +199,41 @@ const WorkoutScreen = ({ navigation }) => {
         console.error('Error fetching fitness profile:', error);
       }
     };
+
+    const fetchExercisesByLevel = async () => {
+      try {
+        setLoading(true);
+        
+        // Fetch beginner exercises
+        const beginnerResponse = await exerciseServices.getAllExercises({ level: 'beginner' });
+        console.log('Beginner response:', beginnerResponse);
+        if (beginnerResponse.success) {
+          setBeginnerExercises(beginnerResponse.data || []);
+        }
+        
+        // Fetch intermediate exercises
+        const intermediateResponse = await exerciseServices.getAllExercises({ level: 'intermediate' });
+        console.log('Intermediate response:', intermediateResponse);
+        if (intermediateResponse.success) {
+          setIntermediateExercises(intermediateResponse.data || []);
+        }
+        
+        // Fetch advanced exercises
+        const advancedResponse = await exerciseServices.getAllExercises({ level: 'advanced' });
+        console.log('Advanced response:', advancedResponse);
+        if (advancedResponse.success) {
+          setAdvancedExercises(advancedResponse.data || []);
+        }
+      } catch (error) {
+        console.error('Error fetching exercises by level:', error);
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchFitnessProfile();
+    fetchExercisesByLevel();
 
     const onLanguageChange = () => {
       console.log('Ngôn ngữ đã thay đổi trong WorkoutScreen:', i18n.language);
@@ -394,6 +439,91 @@ const WorkoutScreen = ({ navigation }) => {
     </View>
   );
 
+  const LevelExerciseItem = ({ item, level }) => (
+    <TouchableOpacity
+      style={styles(colors).levelExerciseItem}
+      onPress={() => {
+        navigation.navigate('ExerciseDetail', { exercise: item });
+      }}
+    >
+      {item.imageUrl ? (
+        <Image 
+          source={{ uri: item.imageUrl }} 
+          style={styles(colors).levelExerciseImage} 
+        />
+      ) : (
+        <View style={styles(colors).levelExerciseImagePlaceholder}>
+          <Text style={styles(colors).levelExerciseImagePlaceholderText}>🏃‍♂️</Text>
+        </View>
+      )}
+      <View style={styles(colors).levelExerciseInfo}>
+        <Text style={styles(colors).levelExerciseTitle}>{item.name || 'Bài tập không tên'}</Text>
+        <Text style={styles(colors).levelExerciseSubtitle}>
+          {item.duration || 0} phút • {item.category || 'Không phân loại'}
+        </Text>
+        <View style={styles(colors).levelExerciseTags}>
+          <Text style={styles(colors).levelExerciseTag}>{level}</Text>
+        </View>
+      </View>
+      <Text style={styles(colors).levelExerciseArrow}>→</Text>
+    </TouchableOpacity>
+  );
+
+    const LevelSection = ({ title, exercises, level, levelKey }) => {
+    console.log(`LevelSection ${levelKey}:`, { title, exercisesCount: exercises?.length, exercises });
+    
+    const displayExercises = showAllExercises[levelKey] ? exercises : exercises?.slice(0, 3);
+    const hasMoreExercises = exercises && exercises.length > 3;
+    
+    return (
+      <View style={styles(colors).levelSection}>
+        <View style={styles(colors).sectionHeader}>
+          <Text style={styles(colors).sectionTitle}>{title} ({exercises?.length || 0})</Text>
+          {hasMoreExercises && (
+            <TouchableOpacity
+              onPress={() => {
+                setShowAllExercises(prev => ({
+                  ...prev,
+                  [levelKey]: !prev[levelKey]
+                }));
+              }}
+            >
+              <Text style={styles(colors).moreLink}>
+                {showAllExercises[levelKey] ? t('show_less') : t('show_more')}
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      {loading ? (
+        <View style={styles(colors).loadingContainer}>
+          <Text style={styles(colors).loadingText}>{t('loading')}</Text>
+        </View>
+      ) : exercises && exercises.length > 0 ? (
+        <View style={styles(colors).levelExerciseList}>
+          <FlatList
+            data={displayExercises} // Hiển thị bài tập theo state
+            renderItem={({ item }) => <LevelExerciseItem item={item} level={level} />}
+            keyExtractor={(item) => item._id || item.id}
+            scrollEnabled={showAllExercises[levelKey]}
+            showsVerticalScrollIndicator={false}
+            nestedScrollEnabled={true}
+            maxToRenderPerBatch={10}
+            windowSize={10}
+          />
+        </View>
+      ) : error ? (
+        <View style={styles(colors).errorContainer}>
+          <Text style={styles(colors).errorText}>{t('error_loading')}</Text>
+        </View>
+      ) : (
+        <View style={styles(colors).emptyContainer}>
+          <Text style={styles(colors).emptyText}>{t('no_exercises_found', { level: levelKey })}</Text>
+        </View>
+      )}
+    </View>
+  );
+  };
+
   const filteredWorkoutData = DATA.workoutData.filter((item) => item.category === activeTab);
   const filteredExerciseData = DATA.exerciseData.filter((item) => item.goal === activeGoal);
 
@@ -445,20 +575,24 @@ const WorkoutScreen = ({ navigation }) => {
             scrollEnabled={false}
           />
         </View>
-        <View style={styles(colors).recommendSection}>
-          <View style={styles(colors).sectionHeader}>
-            <Text style={styles(colors).sectionTitle}>{t('just_for_you')}</Text>
-            <TouchableOpacity>
-              <Text style={styles(colors).moreLink}>{t('more')}</Text>
-            </TouchableOpacity>
-          </View>
-          <FlatList
-            data={DATA.recommendData}
-            renderItem={RecommendItem}
-            keyExtractor={(item) => item.id}
-            scrollEnabled={false}
-          />
-        </View>
+        <LevelSection 
+          title={t('beginner_exercises')}
+          exercises={beginnerExercises}
+          level={t('beginner')}
+          levelKey="beginner"
+        />
+        <LevelSection 
+          title={t('intermediate_exercises')}
+          exercises={intermediateExercises}
+          level={t('intermediate')}
+          levelKey="intermediate"
+        />
+        <LevelSection 
+          title={t('advanced_exercises')}
+          exercises={advancedExercises}
+          level={t('advanced')}
+          levelKey="advanced"
+        />
         <View style={styles(colors).stretchSection}>
           <View style={styles(colors).sectionHeader}>
             <Text style={styles(colors).sectionTitle}>{t('stretch_warmup')}</Text>
@@ -677,6 +811,93 @@ const styles = (colors) => StyleSheet.create({
   recommendInfo: { flex: 1 },
   recommendTitle: { fontSize: 16, fontWeight: '800', color: colors.text, marginBottom: 4 },
   recommendSubtitle: { fontSize: 14, color: colors.secondary },
+  levelSection: { 
+    paddingHorizontal: 20, 
+    marginBottom: 24,
+    maxHeight: 400, // Giới hạn chiều cao tối đa
+  },
+  levelExerciseList: {
+    maxHeight: 320, // Chiều cao tối đa cho danh sách bài tập
+  },
+  levelExerciseItem: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    marginBottom: 16,
+    paddingVertical: 8,
+  },
+  levelExerciseImage: { 
+    width: 80, 
+    height: 80, 
+    borderRadius: 16, 
+    marginRight: 16,
+    backgroundColor: colors.border,
+  },
+  levelExerciseImagePlaceholder: {
+    width: 80, 
+    height: 80, 
+    borderRadius: 16, 
+    marginRight: 16,
+    backgroundColor: colors.border,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  levelExerciseImagePlaceholderText: {
+    fontSize: 32,
+  },
+  levelExerciseInfo: { flex: 1 },
+  levelExerciseTitle: { 
+    fontSize: 16, 
+    fontWeight: '800', 
+    color: colors.text, 
+    marginBottom: 4 
+  },
+  levelExerciseSubtitle: { 
+    fontSize: 14, 
+    color: colors.secondary,
+    marginBottom: 8,
+  },
+  levelExerciseTags: { 
+    flexDirection: 'row', 
+    gap: 8 
+  },
+  levelExerciseTag: { 
+    fontSize: 12, 
+    fontWeight: '600', 
+    color: colors.primary,
+    backgroundColor: colors.primary + '20',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  levelExerciseArrow: { 
+    fontSize: 18, 
+    color: colors.muted,
+    marginLeft: 8,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  loadingText: {
+    fontSize: 14,
+    color: colors.muted,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  emptyText: {
+    fontSize: 14,
+    color: colors.muted,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    paddingVertical: 20,
+  },
+  errorText: {
+    fontSize: 14,
+    color: colors.error || '#ef4444',
+  },
   stretchSection: { paddingLeft: 20, marginBottom: 24 },
   stretchList: { paddingRight: 20 },
   stretchCard: { width: 160, height: 100, borderRadius: 16, marginRight: 16, overflow: 'hidden', position: 'relative' },
