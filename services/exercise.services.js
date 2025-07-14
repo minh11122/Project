@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:7777/api'; // URL backend thực tế
+const API_BASE_URL = 'https://project-xnuq.onrender.com/api'; // URL backend thực tế
 
 class ExerciseService {
   static async getExercisesByCategoryAndLevel(category, level) {
