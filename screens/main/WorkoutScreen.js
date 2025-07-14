@@ -13,6 +13,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ThemeContext } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import fitnessProfileServices from "../../services/fitnessProfile.services";
 
 const { width } = Dimensions.get('window');
 
@@ -173,8 +174,22 @@ const WorkoutScreen = ({ navigation }) => {
   const [activeGoal, setActiveGoal] = useState('build_muscle');
   const [searchText, setSearchText] = useState('');
   const [language, setLanguage] = useState(i18n.language);
+  const [fitnessProfile, setFitnessProfile] = useState(null);
 
   useEffect(() => {
+    const fetchFitnessProfile = async () => {
+      try {
+        const response = await fitnessProfileServices.getFitnessProfileByUserId();
+        const data = await response;
+        if (data.success) {
+          setFitnessProfile(data.profile);
+        }
+      } catch (error) {
+        console.error('Error fetching fitness profile:', error);
+      }
+    };
+    fetchFitnessProfile();
+
     const onLanguageChange = () => {
       console.log('Ngôn ngữ đã thay đổi trong WorkoutScreen:', i18n.language);
       setLanguage(i18n.language);
@@ -235,11 +250,14 @@ const WorkoutScreen = ({ navigation }) => {
     const daysOfWeek = Array.from({ length: 7 }, (_, index) => {
       const day = new Date(startOfWeek);
       day.setDate(startOfWeek.getDate() + index);
+      const dayNames = ['CHỦ NHẬT', 'THỨ HAI', 'THỨ BA', 'THỨ TƯ', 'THỨ NĂM', 'THỨ SÁU', 'THỨ BẢY'];
       return {
         date: day.getDate().toString(),
         month: day.getMonth(),
         year: day.getFullYear(),
         isCurrentDay: day.getDate() === currentDay && day.getMonth() === currentMonth && day.getFullYear() === currentYear,
+        isWorkoutDay: fitnessProfile?.workoutDays.includes(dayNames[index]) || false,
+        dayName: dayNames[index],
       };
     });
 
@@ -254,7 +272,7 @@ const WorkoutScreen = ({ navigation }) => {
         <View style={styles(colors).weeklyGoalHeader}>
           <Text style={styles(colors).weeklyGoalTitle}>{t('weekly_goal', { range: weekRange })}</Text>
           <View style={styles(colors).scoreContainer}>
-            <Text style={styles(colors).scoreBlue}>0</Text>
+            <Text style={styles(colors).scoreBlue}>{fitnessProfile?.workoutDays.length || 0}</Text>
             <Text style={styles(colors).scoreGray}>/7</Text>
             <Text style={styles(colors).editIcon}>✏️</Text>
           </View>
@@ -266,6 +284,7 @@ const WorkoutScreen = ({ navigation }) => {
               style={[
                 styles(colors).dayButton,
                 dayObj.isCurrentDay && styles(colors).activeDayButton,
+                dayObj.isWorkoutDay && styles(colors).workoutDayButton,
                 index > currentDayIndex && styles(colors).disabledDayButton,
               ]}
               disabled={index > currentDayIndex}
@@ -274,6 +293,7 @@ const WorkoutScreen = ({ navigation }) => {
                 style={[
                   styles(colors).dayText,
                   dayObj.isCurrentDay && styles(colors).activeDayText,
+                  dayObj.isWorkoutDay && styles(colors).workoutDayText,
                   index > currentDayIndex && styles(colors).disabledDayText,
                 ]}
               >
@@ -315,7 +335,6 @@ const WorkoutScreen = ({ navigation }) => {
     <TouchableOpacity
       style={styles(colors).workoutItem}
       onPress={() => {
-        // Map category to Vietnamese
         const categoryMap = {
           'abs': 'Bụng',
           'arms': 'Tay',
@@ -324,7 +343,6 @@ const WorkoutScreen = ({ navigation }) => {
           'shoulders': 'Vai'
         };
         
-        // Map difficulty to level
         const levelMap = {
           1: 'beginner',
           2: 'intermediate',
@@ -376,10 +394,7 @@ const WorkoutScreen = ({ navigation }) => {
     </View>
   );
 
-  // Lọc bài tập theo tab được chọn
   const filteredWorkoutData = DATA.workoutData.filter((item) => item.category === activeTab);
-
-  // Lọc bài tập theo mục tiêu được chọn
   const filteredExerciseData = DATA.exerciseData.filter((item) => item.goal === activeGoal);
 
   return (
@@ -596,9 +611,11 @@ const styles = (colors) => StyleSheet.create({
   daysRow: { flexDirection: 'row', gap: 24, marginBottom: 12 },
   dayButton: { width: 32, height: 32, justifyContent: 'center', alignItems: 'center' },
   activeDayButton: { backgroundColor: colors.primary + '33', borderRadius: 16, borderWidth: 2, borderColor: colors.primary },
+  workoutDayButton: { backgroundColor: colors.accent + '33', borderRadius: 16, borderWidth: 2, borderColor: colors.accent },
   disabledDayButton: { opacity: 0.5 },
   dayText: { fontSize: 18, fontWeight: '600', color: colors.text },
   activeDayText: { color: colors.primary, fontWeight: '700' },
+  workoutDayText: { color: colors.accent, fontWeight: '700' },
   disabledDayText: { color: colors.secondary },
   weeklyMessage: { marginTop: 12 },
   motivationText: { fontSize: 14, color: colors.muted, textAlign: 'center' },
