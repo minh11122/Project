@@ -122,10 +122,6 @@ const SettingsScreen = () => {
             <Ionicons name="refresh" size={20} color={colors.primary} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles(colors).premiumButton}>
-          <Ionicons name="ban" size={16} color={colors.card} />
-          <Text style={styles(colors).premiumText}>{t('GO PREMIUM')}</Text>
-        </TouchableOpacity>
         <View style={styles(colors).settingsList}>
           <SettingItem
             icon="fitness"
@@ -296,22 +292,6 @@ const styles = (colors) => StyleSheet.create({
     padding: 8,
     backgroundColor: colors.border,
     borderRadius: 12,
-  },
-  premiumButton: {
-    width: '100%',
-    backgroundColor: colors.accent,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingVertical: 12,
-    borderRadius: 24,
-    marginBottom: 24,
-    gap: 8,
-  },
-  premiumText: {
-    color: colors.accentText,
-    fontWeight: '600',
-    fontSize: 14,
   },
   settingsList: {
     borderRadius: 24,

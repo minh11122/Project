@@ -80,7 +80,10 @@ const ExerciseScreen = () => {
     name: t('no_exercise'),
     duration: 3, // Default to 3 minutes as number
     imageUrl: null,
+    image: null,
   };
+  // Lấy link ảnh ưu tiên imageUrl, fallback sang image
+  const imageSource = currentExercise.imageUrl || currentExercise.image;
   
   console.log('Current exercise:', currentExercise);
   console.log('Current exercise index:', currentExerciseIndex);
@@ -223,30 +226,38 @@ const ExerciseScreen = () => {
             <FontAwesome5 name="arrow-left" size={18} color={colors.icon || '#4B5563'} />
           </TouchableOpacity>
 
-          {currentExercise.imageUrl ? (
-            <Image
-              source={{ uri: currentExercise.imageUrl }}
-              style={styles(colors).image}
-              resizeMode="contain"
-              accessible
-              accessibilityLabel={t('exercise_image', { name: currentExercise.name })}
-            />
-          ) : (
-            <View style={styles(colors).imagePlaceholder}>
-              <FontAwesome5 name="dumbbell" size={60} color={colors.muted} />
-              <Text style={styles(colors).placeholderText}>Không có ảnh</Text>
+          {/* Nếu là bài tập nghỉ thì không hiển thị hình ảnh */}
+          {currentExercise.isRest ? (
+            <View style={[styles(colors).imagePlaceholder, { justifyContent: 'center', alignItems: 'center', backgroundColor: '#FDE68A' }]}> 
+              <FontAwesome5 name="coffee" size={60} color={colors.primary} />
+              <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.primary, marginTop: 16 }}>Nghỉ giải lao</Text>
+              <Text style={{ fontSize: 16, color: colors.text, marginTop: 8 }}>Chuẩn bị cho bài tiếp theo</Text>
             </View>
+          ) : (
+            imageSource ? (
+              <Image
+                source={{ uri: imageSource }}
+                style={styles(colors).image}
+                resizeMode="contain"
+                accessible
+                accessibilityLabel={t('exercise_image', { name: currentExercise.name })}
+              />
+            ) : (
+              <View style={styles(colors).imagePlaceholder}>
+                <FontAwesome5 name="dumbbell" size={60} color={colors.muted} />
+                <Text style={styles(colors).placeholderText}>Không có ảnh</Text>
+              </View>
+            )
           )}
 
           <View style={styles(colors).topRightButtons}>
             <TouchableOpacity style={styles(colors).iconButton} accessibilityLabel={t('video')}>
               <FontAwesome5 name="video" size={18} color={colors.icon || '#4B5563'} />
             </TouchableOpacity>
-            <TouchableOpacity style={styles(colors).iconButton} accessibilityLabel={t('volume')}>
-              <FontAwesome5 name="volume-up" size={18} color={colors.icon || '#4B5563'} />
-            </TouchableOpacity>
           </View>
 
+          {/* XÓA NÚT BÌNH LUẬN VÀ NÚT THÍCH */}
+          {/*
           <View style={styles(colors).bottomRightButtons}>
             <TouchableOpacity style={styles(colors).iconButton} accessibilityLabel={t('comment')}>
               <FontAwesome5 name="comment" size={18} color={colors.icon || '#4B5563'} />
@@ -255,14 +266,17 @@ const ExerciseScreen = () => {
               <FontAwesome5 name="thumbs-up" size={18} color={colors.icon || '#4B5563'} />
             </TouchableOpacity>
           </View>
+          */}
         </View>
 
         <View style={styles(colors).middleContent}>
           <View style={styles(colors).titleRow}>
-            <Text style={styles(colors).title}>{currentExercise.name}</Text>
-            <TouchableOpacity style={styles(colors).helpButton} accessibilityLabel={t('help')}>
-              <Text style={styles(colors).helpText}>?</Text>
-            </TouchableOpacity>
+            <Text style={styles(colors).title}>{currentExercise.isRest ? 'Nghỉ' : currentExercise.name}</Text>
+            {!currentExercise.isRest && (
+              <TouchableOpacity style={styles(colors).helpButton} accessibilityLabel={t('help')}>
+                <Text style={styles(colors).helpText}>?</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           <Text style={styles(colors).timer}>{formatTimer(timer)}</Text>

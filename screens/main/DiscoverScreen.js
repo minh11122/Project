@@ -13,6 +13,8 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/FontAwesome5';
 import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
 import { useTranslation } from 'react-i18next';
+import exerciseServices from '../../services/exercise.services';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { width } = Dimensions.get('window');
 
@@ -114,14 +116,51 @@ const DiscoverScreen = () => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState(i18n.language);
 
+  // State cho dữ liệu động
+  const [picks, setPicks] = useState([]);
+  const [beginnerWorkouts, setBeginnerWorkouts] = useState([]);
+  const [fastWorkouts, setFastWorkouts] = useState([]);
+  const [challenges, setChallenges] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const onLanguageChange = () => {
-      console.log('Language changed in DiscoverScreen:', i18n.language);
       setLanguage(i18n.language);
     };
     i18n.on('languageChanged', onLanguageChange);
     return () => i18n.off('languageChanged', onLanguageChange);
   }, [i18n]);
+
+  useEffect(() => {
+    // Gọi API backend để lấy dữ liệu động
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        // Lấy bài tập nổi bật (ví dụ: random 2 bài tập bất kỳ)
+        const allRes = await exerciseServices.getAllExercises();
+        let allExercises = allRes?.data || [];
+        if (allExercises.length > 0) {
+          setPicks(allExercises.slice(0, 2));
+        }
+        // Lấy bài tập cho người mới
+        const beginnerRes = await exerciseServices.getAllExercises({ level: 'beginner' });
+        setBeginnerWorkouts(beginnerRes?.data?.slice(0, 5) || []);
+        // Lấy bài tập nhanh (ví dụ: duration <= 7 phút)
+        setFastWorkouts(allExercises.filter(e => e.duration && e.duration <= 7).slice(0, 5));
+        // Lấy challenge (ví dụ: các bài tập có category là 'challenge' hoặc random 3 bài)
+        setChallenges(allExercises.filter(e => e.category && e.category.toLowerCase().includes('challenge')).slice(0, 3));
+      } catch (err) {
+        // Nếu lỗi, fallback sang DATA tĩnh
+        setPicks(DATA.picksData);
+        setBeginnerWorkouts(DATA.beginnerWorkouts);
+        setFastWorkouts(DATA.fastWorkouts);
+        setChallenges(DATA.challenges);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
+  }, []);
 
   const renderPickItem = ({ item }) => (
     <TouchableOpacity style={styles(colors).pickItem}>
@@ -213,9 +252,9 @@ const DiscoverScreen = () => {
         <View style={styles(colors).section}>
           <Text style={styles(colors).sectionTitle}>{t('picks_for_you')}</Text>
           <FlatList
-            data={DATA.picksData}
+            data={picks}
             renderItem={renderPickItem}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id || item._id}
             scrollEnabled={false}
           />
         </View>
@@ -234,9 +273,9 @@ const DiscoverScreen = () => {
         <View style={styles(colors).section}>
           <Text style={styles(colors).sectionTitle}>{t('for_beginners')}</Text>
           <FlatList
-            data={DATA.beginnerWorkouts}
+            data={beginnerWorkouts}
             renderItem={renderBeginnerCard}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id || item._id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles(colors).horizontalList}
@@ -245,18 +284,18 @@ const DiscoverScreen = () => {
         <View style={styles(colors).section}>
           <Text style={styles(colors).sectionTitle}>{t('fast_workout')}</Text>
           <FlatList
-            data={DATA.fastWorkouts}
+            data={fastWorkouts}
             renderItem={renderFastWorkout}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id || item._id}
             scrollEnabled={false}
           />
         </View>
         <View style={styles(colors).section}>
           <Text style={styles(colors).sectionTitle}>{t('challenge')}</Text>
           <FlatList
-            data={DATA.challenges}
+            data={challenges}
             renderItem={renderChallenge}
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.id || item._id}
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles(colors).horizontalList}

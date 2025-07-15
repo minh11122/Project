@@ -261,10 +261,11 @@ const WorkoutScreen = ({ navigation }) => {
       <Text style={styles(colors).headerTitle}>{t('home_workout')}</Text>
       <View style={styles(colors).headerIcons}>
         <Text style={styles(colors).heartIcon}>❤️</Text>
-        <TouchableOpacity style={styles(colors).proButton}>
+        {/* XÓA NÚT PRO */}
+        {/* <TouchableOpacity style={styles(colors).proButton}>
           <Text style={styles(colors).proIcon}>👑</Text>
           <Text style={styles(colors).proText}>{t('pro')}</Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </View>
   );
@@ -685,17 +686,18 @@ const styles = (colors) => StyleSheet.create({
   headerTitle: { fontSize: 24, fontWeight: '800', color: colors.text },
   headerIcons: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   heartIcon: { fontSize: 24 },
-  proButton: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-  },
-  proIcon: { fontSize: 14 },
-  proText: { color: colors.accentText, fontWeight: '600', fontSize: 12 },
+  // XÓA style proButton, proIcon, proText
+  // proButton: {
+  //   backgroundColor: colors.accent,
+  //   paddingHorizontal: 12,
+  //   paddingVertical: 4,
+  //   borderRadius: 20,
+  //   flexDirection: 'row',
+  //   alignItems: 'center',
+  //   gap: 6,
+  // },
+  // proIcon: { fontSize: 14 },
+  // proText: { color: colors.accentText, fontWeight: '600', fontSize: 12 },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',

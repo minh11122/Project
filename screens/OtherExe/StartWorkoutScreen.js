@@ -11,7 +11,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { ThemeContext } from '../../context/ThemeContext'; // Adjust path as needed
 import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 const { width } = Dimensions.get('window');
 
@@ -20,6 +20,8 @@ const StartWorkoutScreen = () => {
   const { t, i18n } = useTranslation();
   const [language, setLanguage] = useState(i18n.language);
   const navigation = useNavigation();
+  const route = useRoute();
+  const { exercises = [] } = route.params || {};
 
   useEffect(() => {
     const onLanguageChange = () => {
@@ -29,19 +31,6 @@ const StartWorkoutScreen = () => {
     i18n.on('languageChanged', onLanguageChange);
     return () => i18n.off('languageChanged', onLanguageChange);
   }, [i18n]);
-
-  const exercises = [
-    {
-      name: t('scissor_arms'),
-      duration: '00:30',
-      image: 'https://storage.googleapis.com/a1aa/image/3644d9b4-62a8-4ce0-85f9-a1767aec19ff.jpg',
-    },
-    {
-      name: t('hip_rotation'),
-      duration: '00:30',
-      image: 'https://storage.googleapis.com/a1aa/image/e3f6c24e-3ded-4c6e-e627-6aea96acb147.jpg',
-    },
-  ];
 
   return (
     <View style={styles(colors).container}>
@@ -104,7 +93,7 @@ const StartWorkoutScreen = () => {
               />
               <View style={styles(colors).exerciseInfo}>
                 <Text style={styles(colors).exerciseName}>{exercise.name}</Text>
-                <Text style={styles(colors).exerciseDuration}>{exercise.duration}</Text>
+                <Text style={styles(colors).exerciseDuration}>{typeof exercise.duration === 'number' ? `${exercise.duration}s` : exercise.duration}</Text>
               </View>
               <TouchableOpacity style={styles(colors).reorderHandle} accessibilityLabel={t('reorder_handle', { name: exercise.name })}>
                 <Ionicons name="swap-vertical" size={20} color={colors.icon || '#9ca3af'} />
@@ -117,7 +106,7 @@ const StartWorkoutScreen = () => {
       <View style={styles(colors).footer}>
         <TouchableOpacity
           style={styles(colors).startButton}
-          onPress={() => navigation.navigate('Exercise', { exercises })} // Navigate to ExerciseScreen with exercises
+          onPress={() => navigation.navigate('Exercise', { exercises })} // Truyền đúng mảng đã có quảng nghỉ
           accessibilityLabel={t('start_workout')}
         >
           <Text style={styles(colors).startButtonText}>{t('start')}</Text>

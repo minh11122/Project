@@ -155,14 +155,6 @@ const ExerciseDetailScreen = () => {
         <FontAwesome5 name="play" size={18} color="#fff" />
         <Text style={styles(colors).startButtonText}>Bắt đầu tập</Text>
       </TouchableOpacity>
-      
-      <TouchableOpacity
-        style={styles(colors).favoriteButton}
-        onPress={() => {/* TODO: Add to favorites */}}
-      >
-        <FontAwesome5 name="heart" size={18} color={colors.primary} />
-        <Text style={styles(colors).favoriteButtonText}>Yêu thích</Text>
-      </TouchableOpacity>
     </View>
   );
 
@@ -355,22 +347,6 @@ const styles = (colors) => StyleSheet.create({
   },
   startButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
-  },
-  favoriteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: colors.primary,
-  },
-  favoriteButtonText: {
-    color: colors.primary,
     fontSize: 16,
     fontWeight: '600',
     marginLeft: 8,

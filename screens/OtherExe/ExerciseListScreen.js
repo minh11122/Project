@@ -60,7 +60,24 @@ const ExerciseListScreen = () => {
       Alert.alert('Thông báo', 'Không có bài tập nào để bắt đầu');
       return;
     }
-    navigation.navigate('StartWorkout', { exercises });
+    // Chèn quảng nghỉ 30s giữa các bài tập và chuẩn hóa imageUrl
+    const exercisesWithRest = [];
+    exercises.forEach((ex, idx) => {
+      // Chuẩn hóa imageUrl
+      const normalized = { ...ex };
+      if (!normalized.imageUrl && normalized.image) {
+        normalized.imageUrl = normalized.image;
+      }
+      exercisesWithRest.push(normalized);
+      if (idx < exercises.length - 1) {
+        exercisesWithRest.push({
+          name: 'Nghỉ',
+          duration: 30, // giây
+          isRest: true
+        });
+      }
+    });
+    navigation.navigate('StartWorkout', { exercises: exercisesWithRest });
   };
 
   const renderExerciseItem = ({ item }) => (
