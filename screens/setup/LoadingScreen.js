@@ -10,6 +10,9 @@ import {
 import Svg, { Circle, Defs, LinearGradient, Stop } from "react-native-svg";
 import { FontAwesome5 } from "@expo/vector-icons";
 import fitnessProfileServices from "../../services/fitnessProfile.services";
+import WorkoutAIService from "../../services/WorkoutAIService";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { jwtDecode } from "jwt-decode";
 
 export default function ProgressPlanScreen({ navigation, route }) {
   const [progress, setProgress] = useState(0);
@@ -39,6 +42,13 @@ export default function ProgressPlanScreen({ navigation, route }) {
 
       try {
         await fitnessProfileServices.createFitnessProfile(profileData);
+        // Lấy userId từ token
+        const token = await AsyncStorage.getItem('token');
+        const decoded = jwtDecode(token);
+        const userId = decoded.userId || decoded._id || decoded.id;
+        console.log(userId);
+        // Gọi API tạo recommendation
+        await WorkoutAIService.getRecommendation(userId);
         simulateProgress();
       } catch (error) {
         console.log(profileData);
@@ -95,13 +105,13 @@ export default function ProgressPlanScreen({ navigation, route }) {
           <View style={styles.infoContainer}>
             <Text style={styles.infoLine}>
               <FontAwesome5 name="check" size={14} color="#60A5FA" />{"  "}
-              Phân tích cơ thể:{" "}
+              Phân tích cơ thể: {" "}
               <Text style={styles.highlightBlue}>{profileData.height}cm</Text>,{" "}
               <Text style={styles.highlightBlue}>{profileData.weight}kg</Text>
             </Text>
             <Text style={styles.infoLine}>
               <FontAwesome5 name="sync-alt" size={14} color="#60A5FA" />{"  "}
-              Cấp độ thể dục:{" "}
+              Cấp độ thể dục: {" "}
               <Text style={styles.highlightStrong}>{profileData.level}</Text>
             </Text>
           </View>
