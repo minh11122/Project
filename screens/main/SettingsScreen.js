@@ -1,5 +1,4 @@
-// screens/main/SettingsScreen.js
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import {
   View,
   Text,
@@ -11,11 +10,14 @@ import {
   SafeAreaView,
   Modal,
   FlatList,
+  Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { ThemeContext } from '../../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import PushNotificationIOS from '@react-native-community/push-notification-ios';
 
 const languages = [
   { code: 'vi', name: 'Tiếng Việt' },
@@ -26,7 +28,48 @@ const SettingsScreen = () => {
   const { theme, toggleTheme, colors } = useContext(ThemeContext);
   const { t, i18n } = useTranslation();
   const [healthConnectEnabled, setHealthConnectEnabled] = useState(false);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [languageModalVisible, setLanguageModalVisible] = useState(false);
+
+  useEffect(() => {
+    // Check notification permission status on mount
+    if (Platform.OS === 'ios') {
+      PushNotificationIOS.checkPermissions((permissions) => {
+        setNotificationsEnabled(permissions.alert || permissions.badge || permissions.sound);
+      });
+    } else {
+      // For Android, you might want to use another library like react-native-push-notification
+      AsyncStorage.getItem('notificationsEnabled').then((value) => {
+        setNotificationsEnabled(value === 'true');
+      });
+    }
+  }, []);
+
+  const toggleNotifications = async () => {
+    if (Platform.OS === 'ios') {
+      if (!notificationsEnabled) {
+        try {
+          await PushNotificationIOS.requestPermissions();
+          setNotificationsEnabled(true);
+          await AsyncStorage.setItem('notificationsEnabled', 'true');
+        } catch (error) {
+          Alert.alert(t('Error'), t('Failed to enable notifications'));
+        }
+      } else {
+        // Note: iOS doesn't provide a direct way to disable notifications programmatically
+        // You might want to guide the user to settings
+        Alert.alert(
+          t('Notifications'),
+          t('To disable notifications, please go to your device Settings'),
+        );
+      }
+    } else {
+      // Android handling
+      const newValue = !notificationsEnabled;
+      setNotificationsEnabled(newValue);
+      await AsyncStorage.setItem('notificationsEnabled', newValue.toString());
+    }
+  };
 
   const changeLanguage = async (languageCode) => {
     try {
@@ -171,6 +214,13 @@ const SettingsScreen = () => {
             title="Sync to Health Connect"
             enabled={healthConnectEnabled}
             onToggle={setHealthConnectEnabled}
+          />
+          <View style={styles(colors).separator} />
+          <SyncItem
+            icon="notifications"
+            title="Notifications"
+            enabled={notificationsEnabled}
+            onToggle={toggleNotifications}
           />
         </View>
         <View style={styles(colors).menuContainer}>
