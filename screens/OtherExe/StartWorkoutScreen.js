@@ -22,6 +22,7 @@ const StartWorkoutScreen = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const { exercises = [] } = route.params || {};
+  const [workoutState, setWorkoutState] = useState('idle'); // 'idle' | 'started' | 'paused'
 
   useEffect(() => {
     const onLanguageChange = () => {
